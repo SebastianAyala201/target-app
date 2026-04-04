@@ -5,6 +5,7 @@ import SignIn from './pages/SignIn'
 import Topics from './pages/Topics'
 import Questions from './pages/Questions'
 import Stats from './pages/Stats'
+import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
   return (
@@ -13,9 +14,21 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/register" element={<Register />} />
         <Route path="/signin" element={<SignIn />} />
-        <Route path="/topics" element={<Topics />} />
-        <Route path="/questions/:topico" element={<Questions />} />
-        <Route path="/stats" element={<Stats />} />
+        <Route path="/topics" element={
+          <ProtectedRoute>
+            <Topics />
+          </ProtectedRoute>
+        } />
+        <Route path="/questions/:topico" element={
+          <ProtectedRoute>
+            <Questions />
+          </ProtectedRoute>
+        } />
+        <Route path="/stats" element={
+          <ProtectedRoute>
+            <Stats />
+          </ProtectedRoute>
+        } />
       </Routes>
     </BrowserRouter>
   )
