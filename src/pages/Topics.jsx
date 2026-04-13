@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase'
 
 const topicos = [
   { id: 'nefrologia', nombre: 'Nefrología', imagen: '/topicos/nefrologia.jpg', disponible: true },
+  { id: 'fisiologia_celular' , nombre: 'Fisiología Celular', imagen: '/topicos/fisiologia_celular.jpg', disponible:true},
   { id: 'cardiologia', nombre: 'Cardiología', imagen: '/topicos/cardiologia.jpg', disponible: false },
   { id: 'neurologia', nombre: 'Neurología', imagen: '/topicos/neurologia.jpg', disponible: false },
   { id: 'gastroenterologia', nombre: 'Gastroenterología', imagen: '/topicos/gastroenterologia.jpg', disponible: false },

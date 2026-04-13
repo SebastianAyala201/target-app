@@ -204,6 +204,15 @@ function Questions() {
                 </p>
               </div>
             )}
+            
+            {preguntaActual.bibliografia && (
+              <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '1rem', marginTop: '1rem' }}>
+                <h3 style={{ color: '#475569', fontSize: '0.9rem', fontWeight: '700', marginBottom: '0.5rem' }}>📚 Bibliografía</h3>
+                 <p style={{ color: '#64748b', lineHeight: '1.8', fontSize: '0.85rem', whiteSpace: 'pre-line', margin: 0 }}>
+                    {preguntaActual.bibliografia}
+                  </p>
+              </div>
+            )}
 
             {/* BOTONES */}
             <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', flexWrap: 'wrap' }}>
