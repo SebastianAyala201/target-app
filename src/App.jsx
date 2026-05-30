@@ -7,6 +7,7 @@ import SubTopics from './pages/SubTopics'
 import Questions from './pages/Questions'
 import Stats from './pages/Stats'
 import ProtectedRoute from './components/ProtectedRoute'
+import AutorizadoRoute from './components/AutorizadoRoute'
 
 function App() {
   return (
@@ -15,10 +16,26 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/register" element={<Register />} />
         <Route path="/signin" element={<SignIn />} />
-        <Route path="/topics" element={<ProtectedRoute><Topics /></ProtectedRoute>} />
-        <Route path="/subtopics/:area" element={<ProtectedRoute><SubTopics /></ProtectedRoute>} />
-        <Route path="/questions/:topico" element={<ProtectedRoute><Questions /></ProtectedRoute>} />
-        <Route path="/stats" element={<ProtectedRoute><Stats /></ProtectedRoute>} />
+        <Route path="/topics" element={
+          <AutorizadoRoute>
+            <Topics />
+          </AutorizadoRoute>
+        } />
+        <Route path="/subtopics/:area" element={
+          <AutorizadoRoute>
+            <SubTopics />
+          </AutorizadoRoute>
+        } />
+        <Route path="/questions/:topico" element={
+          <AutorizadoRoute>
+            <Questions />
+          </AutorizadoRoute>
+        } />
+        <Route path="/stats" element={
+          <AutorizadoRoute>
+            <Stats />
+          </AutorizadoRoute>
+        } />
       </Routes>
     </BrowserRouter>
   )
