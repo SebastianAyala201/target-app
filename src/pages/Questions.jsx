@@ -23,9 +23,6 @@ function Questions() {
       .from('preguntas')
       .select('*')
       .eq('topico', topico)
-    console.log('data:', data)
-    console.log('error:', error)
-    console.log('topico:', topico)
     if (!error) setPreguntas(data)
     setLoading(false)
   }
@@ -221,7 +218,7 @@ function Questions() {
                   Siguiente pregunta →
                 </button>
               )}
-              <button onClick={() => navigate('/topics')} style={btnSecStyle}>
+              <button onClick={() => navigate(-1)} style={btnSecStyle}>
                 Volver a tópicos
               </button>
               <button onClick={handleFinalizar} style={btnSecStyle}>

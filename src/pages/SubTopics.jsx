@@ -12,8 +12,8 @@ const areas = {
     nombre: 'Fisiopatología',
     subtopicos: [
       { id: 'nefrologia', nombre: 'Nefrología', imagen: '/topicos/nefrologia.jpg', disponible: true },
-      { id: 'reumatologia', nombre: 'Reumatología', imagen: '/topicos/reumatologia.jpg', disponible: false },
-      { id: 'gastroenterologia', nombre: 'Gastroenterología', imagen: '/topicos/gastroenterologia.jpg', disponible: false },
+      { id: 'reumatologia', nombre: 'Reumatología', imagen: '/topicos/reumatologia.jpg', disponible: true },
+      { id: 'gastroenterologia', nombre: 'Gastroenterología', imagen: '/topicos/gastroenterologia.jpg', disponible: true },
     ]
   },
   anatomia: {
