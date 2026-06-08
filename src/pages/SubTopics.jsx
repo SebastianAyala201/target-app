@@ -60,7 +60,7 @@ function SubTopics() {
 
       {/* NAVBAR */}
       <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 2.5rem', backgroundColor: '#166534', boxShadow: '0 2px 10px rgba(0,0,0,0.2)' }}>
-        <h1 style={{ color: 'white', fontSize: '1.5rem', fontWeight: '800', margin: 0, cursor: 'pointer' }} onClick={() => navigate('/topics')}>TARGET</h1>
+        <h1 style={{ color: 'white', fontSize: '1.5rem', fontWeight: '800', margin: 0 }}>HIGH YIELDS</h1>
         <button onClick={() => navigate('/topics')} style={{ background: 'none', border: '1.5px solid white', color: 'white', padding: '8px 20px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.9rem' }}>
           ← Volver a áreas
         </button>

@@ -71,7 +71,7 @@ function LandingPage() {
             letterSpacing: '0.04em',
             lineHeight: 1.1
           }}>
-            TARGET
+            HIGH YIELDS
           </h1>
 
           <p style={{
@@ -81,7 +81,7 @@ function LandingPage() {
             marginBottom: '2rem',
             maxWidth: '420px'
           }}>
-            Practica preguntas médicas de nivel profesional, analiza tu desempeño y lleva tu preparación al siguiente nivel.
+            Practica preguntas médicas de nivel profesional con High Yields, analiza tu desempeño y lleva tu preparación al siguiente nivel.
           </p>
 
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
