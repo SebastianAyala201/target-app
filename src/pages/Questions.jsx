@@ -291,7 +291,7 @@ function Questions() {
 
             <div style={cardStyle}>
               <p style={{ fontSize: '1rem', lineHeight: '1.8', color: '#14532d', whiteSpace: 'pre-line' }}>
-                {preguntaActual.enunciado}
+                {preguntaActual.enunciado?.trimEnd()}
               </p>
               {preguntaActual.imagen_pregunta && (
                 <img src={`/preguntas/${preguntaActual.imagen_pregunta}`} alt="Imagen pregunta"
