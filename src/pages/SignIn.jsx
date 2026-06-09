@@ -26,14 +26,14 @@ function SignIn() {
     if (signInError) {
       setError('Correo o contraseña incorrectos.'); return
     }
-    navigate('/topics')
+    navigate('/areas')
   }
 
   const handleGoogleLogin = async () => {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: 'https://target-app-gray.vercel.app/topics'
+        redirectTo: 'https://target-app-gray.vercel.app/areas'
       }
     })
   }

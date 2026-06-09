@@ -112,7 +112,7 @@ function Dashboard() {
       <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 2.5rem', backgroundColor: '#166534', boxShadow: '0 2px 10px rgba(0,0,0,0.2)' }}>
         <h1 style={{ color: 'white', fontSize: '1.5rem', fontWeight: '800', margin: 0 }}>HIGH YIELDS</h1>
         <div style={{ display: 'flex', gap: '1rem' }}>
-          <button onClick={() => navigate('/topics')} style={{ background: 'none', border: '1.5px solid white', color: 'white', padding: '8px 20px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.9rem' }}>
+          <button onClick={() => navigate('/areas')} style={{ background: 'none', border: '1.5px solid white', color: 'white', padding: '8px 20px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.9rem' }}>
             Practicar
           </button>
           <button onClick={handleLogout} style={{ background: 'none', border: '1.5px solid white', color: 'white', padding: '8px 20px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.9rem' }}>
@@ -168,7 +168,7 @@ function Dashboard() {
             <p style={{ fontSize: '3rem', margin: '0 0 1rem' }}>📚</p>
             <h3 style={{ color: '#14532d', marginBottom: '0.5rem' }}>Aún no has respondido preguntas</h3>
             <p style={{ color: '#166534', marginBottom: '1.5rem' }}>Empieza a practicar para ver tu progreso aquí</p>
-            <button onClick={() => navigate('/topics')}
+            <button onClick={() => navigate('/areas')}
               style={{ backgroundColor: '#16a34a', color: 'white', border: 'none', padding: '12px 28px', borderRadius: '8px', fontSize: '1rem', fontWeight: '600', cursor: 'pointer' }}>
               Comenzar ahora →
             </button>
