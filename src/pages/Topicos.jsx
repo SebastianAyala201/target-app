@@ -6,7 +6,7 @@ const topicos = {
     topicos: [
       { id: 'fisiologia_celular', nombre: 'Fisiología Celular', imagen: '/topicos/fisiologia_celular.jpg', disponible: true },
       { id: 'fisiologia_nerviosa', nombre: 'Fisiología Nerviosa', imagen: '/topicos/neurologia.jpg', disponible: false },
-      { id: 'fisiologia_renal', nombre: 'Fisiología Renal', imagen: '/topicos/nefrologia.jpg', disponible: false },
+      { id: 'fisiologia_renal', nombre: 'Fisiología Renal', imagen: '/topicos/nefrologia.jpg', disponible: true },
     ]
   },
   fisiopatologia: {
