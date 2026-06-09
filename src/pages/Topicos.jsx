@@ -33,6 +33,7 @@ const topicos = {
     nombre: 'Embriología',
     topicos: [
       { id: 'embriologia_cardiovascular', nombre: 'Embriología Cardiovascular', imagen: '/topicos/embriologia.jpg', disponible: false },
+      { id: 'embriologia_renal', nombre: 'Embriología Renal', imagen: '/topicos/embriologia.jpg', disponible: false },
     ]
   },
   medicina_interna: {
