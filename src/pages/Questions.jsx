@@ -260,7 +260,7 @@ function Questions() {
         .md-content table { border-collapse: collapse; width: 100%; margin: 0.5rem 0; }
         .md-content th, .md-content td { border: 1px solid #bbf7d0; padding: 6px 12px; text-align: left; }
         .md-content th { background-color: #f0fdf4; font-weight: 700; }
-        .md-content strong { color: #14532d; }
+        .md-content strong { color: #052e16; font-weight: 800; }
       `}</style>
 
       <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 2.5rem', backgroundColor: '#166534', boxShadow: '0 2px 10px rgba(0,0,0,0.2)' }}>
@@ -348,7 +348,7 @@ function Questions() {
                 </div>
                 {preguntaActual.imagen_solucion && (
                   <img src={`/soluciones/${preguntaActual.imagen_solucion}`} alt="Imagen solución"
-                    style={{ maxWidth: '100%', borderRadius: '8px', margin: '1rem 0', pointerEvents: 'none' }} />
+                    style={{ maxWidth: '100%', borderRadius: '8px', margin: '1.5rem 0', pointerEvents: 'none' }} />
                 )}
                 {preguntaActual.explicacion_opciones && (
                   <>
