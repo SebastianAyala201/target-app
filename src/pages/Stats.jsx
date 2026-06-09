@@ -78,7 +78,7 @@ function Stats() {
 
         {/* BOTONES */}
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          <button onClick={() => navigate('/topics')} style={btnPrimaryStyle}>
+          <button onClick={() => navigate('/areas')} style={btnPrimaryStyle}>
             Volver a tópicos
           </button>
         </div>
