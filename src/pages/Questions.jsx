@@ -283,6 +283,9 @@ function Questions() {
             <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
               <span style={tagStyle}>📍 {preguntaActual.enfoque?.toUpperCase()}</span>
               <span style={tagStyle}>🧬 {preguntaActual.topico?.charAt(0).toUpperCase() + preguntaActual.topico?.slice(1)}</span>
+              {preguntaActual.subtopico && (
+                <span style={tagStyle}>📂 {preguntaActual.subtopico?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
+              )}
               {modoExamen && <span style={{ ...tagStyle, backgroundColor: '#fef9c3', color: '#854d0e' }}>Modo examen</span>}
             </div>
 
