@@ -33,11 +33,10 @@ function SignIn() {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin + '/topics'
+        redirectTo: 'https://target-app-gray.vercel.app/topics'
       }
     })
   }
-
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f0faf4', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Segoe UI, sans-serif', padding: '2rem' }}>
       <div style={{ backgroundColor: 'white', borderRadius: '16px', padding: '2.5rem', width: '100%', maxWidth: '420px', boxShadow: '0 10px 40px rgba(22,101,52,0.12)' }}>

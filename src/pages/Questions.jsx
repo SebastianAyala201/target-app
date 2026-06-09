@@ -6,22 +6,25 @@ function Questions() {
   const { topico } = useParams()
   const navigate = useNavigate()
 
-  const [preguntas, setPreguntas] = useState([])
+  const [ids, setIds] = useState([])
+  const [preguntaActual, setPreguntaActual] = useState(null)
   const [indice, setIndice] = useState(0)
   const [seleccion, setSeleccion] = useState(null)
   const [respondida, setRespondida] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [loadingPregunta, setLoadingPregunta] = useState(false)
   const [respuestas, setRespuestas] = useState([])
   const [historial, setHistorial] = useState([])
   const [configurando, setConfigurando] = useState(true)
   const [totalSeleccionado, setTotalSeleccionado] = useState(10)
+  const [totalDisponible, setTotalDisponible] = useState(0)
   const [modoExamen, setModoExamen] = useState(false)
   const [tiempoTotal, setTiempoTotal] = useState(30)
   const [tiempoRestante, setTiempoRestante] = useState(null)
   const timerRef = useRef(null)
 
   useEffect(() => {
-    cargarPreguntas()
+    cargarIds()
   }, [topico])
 
   useEffect(() => {
@@ -37,23 +40,39 @@ function Questions() {
     return () => clearInterval(timerRef.current)
   }, [tiempoRestante])
 
-  const cargarPreguntas = async () => {
+  const cargarIds = async () => {
     setLoading(true)
     const { data, error } = await supabase
       .from('preguntas')
-      .select('*')
+      .select('id')
       .eq('topico', topico)
-    if (!error) setPreguntas(data.sort(() => Math.random() - 0.5))
+    if (!error && data) {
+      const shuffled = data.map(d => d.id).sort(() => Math.random() - 0.5)
+      setIds(shuffled)
+      setTotalDisponible(shuffled.length)
+    }
     setLoading(false)
   }
 
-  const iniciarSesion = () => {
-    setConfigurando(false)
-    if (modoExamen) setTiempoRestante(tiempoTotal * 60)
+  const cargarPregunta = async (idx, idsActuales) => {
+    setLoadingPregunta(true)
+    const id = idsActuales[idx]
+    const { data, error } = await supabase
+      .from('preguntas')
+      .select('*')
+      .eq('id', id)
+      .single()
+    if (!error && data) setPreguntaActual(data)
+    setLoadingPregunta(false)
   }
 
-  const preguntasActivas = preguntas.slice(0, totalSeleccionado)
-  const preguntaActual = preguntasActivas[indice]
+  const idsActivos = ids.slice(0, totalSeleccionado)
+
+  const iniciarSesion = async () => {
+    setConfigurando(false)
+    await cargarPregunta(0, ids.slice(0, totalSeleccionado))
+    if (modoExamen) setTiempoRestante(tiempoTotal * 60)
+  }
 
   const opciones = preguntaActual ? [
     { letra: 'A', texto: preguntaActual.opcion_a },
@@ -69,8 +88,9 @@ function Questions() {
     setSeleccion(letra)
     setRespondida(true)
     const correcta = letra === preguntaActual.respuesta_correcta
-    setRespuestas([...respuestas, { id: preguntaActual.id, correcta }])
-    setHistorial([...historial, { seleccion: letra, respondida: true }])
+    const nuevasRespuestas = [...respuestas, { id: preguntaActual.id, correcta }]
+    setRespuestas(nuevasRespuestas)
+    setHistorial([...historial, { seleccion: letra, respondida: true, pregunta: preguntaActual }])
 
     const { data: { session } } = await supabase.auth.getSession()
     if (session) {
@@ -85,23 +105,33 @@ function Questions() {
     }
   }
 
-  const handleSiguiente = () => {
-    setIndice(indice + 1)
-    const sig = historial[indice + 1]
-    if (sig) { setSeleccion(sig.seleccion); setRespondida(sig.respondida) }
-    else { setSeleccion(null); setRespondida(false) }
+  const handleSiguiente = async () => {
+    const nuevoIndice = indice + 1
+    const sig = historial[nuevoIndice]
+    setIndice(nuevoIndice)
+    if (sig) {
+      setPreguntaActual(sig.pregunta)
+      setSeleccion(sig.seleccion)
+      setRespondida(sig.respondida)
+    } else {
+      setSeleccion(null)
+      setRespondida(false)
+      await cargarPregunta(nuevoIndice, idsActivos)
+    }
   }
 
-  const handleAnterior = () => {
-    const ant = historial[indice - 1]
-    setIndice(indice - 1)
+  const handleAnterior = async () => {
+    const nuevoIndice = indice - 1
+    const ant = historial[nuevoIndice]
+    setIndice(nuevoIndice)
+    setPreguntaActual(ant.pregunta)
     setSeleccion(ant.seleccion)
     setRespondida(ant.respondida)
   }
 
   const handleFinalizar = () => {
     clearInterval(timerRef.current)
-    navigate('/stats', { state: { respuestas, total: preguntasActivas.length, modoExamen } })
+    navigate('/stats', { state: { respuestas, total: idsActivos.length, modoExamen } })
   }
 
   const formatTiempo = (seg) => {
@@ -138,65 +168,48 @@ function Questions() {
     </div>
   )
 
-  if (preguntas.length === 0) return (
+  if (totalDisponible === 0) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f0faf4', fontFamily: 'Segoe UI, sans-serif' }}>
       <p style={{ color: '#166534', fontSize: '1.2rem' }}>No hay preguntas disponibles aún.</p>
     </div>
   )
 
-  // PANTALLA DE CONFIGURACIÓN
   if (configurando) return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f0faf4', fontFamily: 'Segoe UI, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
       <div style={{ backgroundColor: 'white', borderRadius: '16px', padding: '2.5rem', maxWidth: '480px', width: '100%', boxShadow: '0 10px 40px rgba(22,101,52,0.12)' }}>
         <h2 style={{ color: '#14532d', fontSize: '1.6rem', fontWeight: '800', marginBottom: '0.5rem' }}>Configurar sesión</h2>
         <p style={{ color: '#166534', fontSize: '0.95rem', marginBottom: '2rem' }}>
-          Hay <strong>{preguntas.length}</strong> preguntas disponibles.
+          Hay <strong>{totalDisponible}</strong> preguntas disponibles.
         </p>
 
         <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '600', color: '#166534', marginBottom: '0.5rem' }}>
           ¿Cuántas preguntas?
         </label>
-        <select
-          value={totalSeleccionado}
-          onChange={e => setTotalSeleccionado(Number(e.target.value))}
+        <select value={totalSeleccionado} onChange={e => setTotalSeleccionado(Number(e.target.value))}
           style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1.5px solid #bbf7d0', fontSize: '1rem', color: '#14532d', marginBottom: '1.5rem', outline: 'none' }}>
-          {[5, 10, 15, 20, 25, 30].filter(n => n <= preguntas.length).map(n => (
+          {[5, 10, 15, 20, 25, 30].filter(n => n <= totalDisponible).map(n => (
             <option key={n} value={n}>{n} preguntas</option>
           ))}
-          <option value={preguntas.length}>Todas ({preguntas.length})</option>
+          <option value={totalDisponible}>Todas ({totalDisponible})</option>
         </select>
 
-        {/* MODO EXAMEN */}
         <div style={{ backgroundColor: '#f0fdf4', border: '1.5px solid #bbf7d0', borderRadius: '12px', padding: '1.2rem', marginBottom: '1.5rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: modoExamen ? '1rem' : 0 }}>
             <div>
               <p style={{ color: '#14532d', fontWeight: '700', fontSize: '0.95rem', margin: 0 }}>⏱️ Modo examen</p>
               <p style={{ color: '#166534', fontSize: '0.8rem', margin: '2px 0 0' }}>Sin explicaciones, con temporizador</p>
             </div>
-            <div
-              onClick={() => setModoExamen(!modoExamen)}
-              style={{
-                width: '48px', height: '26px', borderRadius: '999px', cursor: 'pointer',
-                backgroundColor: modoExamen ? '#16a34a' : '#d1fae5',
-                position: 'relative', transition: 'background 0.2s'
-              }}>
-              <div style={{
-                width: '20px', height: '20px', borderRadius: '50%', backgroundColor: 'white',
-                position: 'absolute', top: '3px',
-                left: modoExamen ? '25px' : '3px', transition: 'left 0.2s',
-                boxShadow: '0 1px 4px rgba(0,0,0,0.2)'
-              }} />
+            <div onClick={() => setModoExamen(!modoExamen)}
+              style={{ width: '48px', height: '26px', borderRadius: '999px', cursor: 'pointer', backgroundColor: modoExamen ? '#16a34a' : '#d1fae5', position: 'relative', transition: 'background 0.2s' }}>
+              <div style={{ width: '20px', height: '20px', borderRadius: '50%', backgroundColor: 'white', position: 'absolute', top: '3px', left: modoExamen ? '25px' : '3px', transition: 'left 0.2s', boxShadow: '0 1px 4px rgba(0,0,0,0.2)' }} />
             </div>
           </div>
-
           {modoExamen && (
             <>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#166534', marginBottom: '0.5rem' }}>
                 Tiempo total (minutos)
               </label>
-              <select
-                value={tiempoTotal}
-                onChange={e => setTiempoTotal(Number(e.target.value))}
+              <select value={tiempoTotal} onChange={e => setTiempoTotal(Number(e.target.value))}
                 style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1.5px solid #bbf7d0', fontSize: '1rem', color: '#14532d', outline: 'none' }}>
                 {[10, 15, 20, 30, 45, 60, 90].map(n => (
                   <option key={n} value={n}>{n} minutos</option>
@@ -218,12 +231,22 @@ function Questions() {
     </div>
   )
 
-  if (indice >= preguntasActivas.length) { handleFinalizar(); return null }
+  if (indice >= idsActivos.length) { handleFinalizar(); return null }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f0faf4', fontFamily: 'Segoe UI, sans-serif' }}>
+    <div
+      style={{ minHeight: '100vh', backgroundColor: '#f0faf4', fontFamily: 'Segoe UI, sans-serif' }}
+      onContextMenu={e => e.preventDefault()}
+    >
+      <style>{`
+        .no-select {
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+        }
+      `}</style>
 
-      {/* NAVBAR */}
       <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 2.5rem', backgroundColor: '#166534', boxShadow: '0 2px 10px rgba(0,0,0,0.2)' }}>
         <h1 style={{ color: 'white', fontSize: '1.5rem', fontWeight: '800', margin: 0 }}>HIGH YIELDS</h1>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
@@ -233,7 +256,7 @@ function Questions() {
             </span>
           )}
           <span style={{ color: '#86efac', fontSize: '0.9rem' }}>
-            Pregunta {indice + 1} de {preguntasActivas.length}
+            Pregunta {indice + 1} de {idsActivos.length}
           </span>
           <button onClick={handleFinalizar} style={{ backgroundColor: 'transparent', border: '1.5px solid white', color: 'white', padding: '8px 20px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.9rem' }}>
             Finalizar
@@ -241,7 +264,6 @@ function Questions() {
         </div>
       </nav>
 
-      {/* BANNER MODO EXAMEN */}
       {modoExamen && (
         <div style={{ backgroundColor: '#fef9c3', borderBottom: '1px solid #fde047', padding: '8px', textAlign: 'center' }}>
           <span style={{ color: '#854d0e', fontSize: '0.85rem', fontWeight: '600' }}>
@@ -250,103 +272,103 @@ function Questions() {
         </div>
       )}
 
-      <div style={{ maxWidth: '860px', margin: '0 auto', padding: '2rem' }}>
+      <div className="no-select" style={{ maxWidth: '860px', margin: '0 auto', padding: '2rem' }}>
 
-        <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
-          <span style={tagStyle}>📍 {preguntaActual.enfoque?.toUpperCase()}</span>
-          <span style={tagStyle}>🧬 {preguntaActual.topico?.charAt(0).toUpperCase() + preguntaActual.topico?.slice(1)}</span>
-          <span style={tagStyle}>ID: Pregunta N°{preguntaActual.id}</span>
-          {modoExamen && <span style={{ ...tagStyle, backgroundColor: '#fef9c3', color: '#854d0e' }}>Modo examen</span>}
-        </div>
-
-        <div style={cardStyle}>
-          <p style={{ fontSize: '1rem', lineHeight: '1.8', color: '#14532d', whiteSpace: 'pre-line' }}>
-            {preguntaActual.enunciado}
-          </p>
-          {preguntaActual.imagen_pregunta && (
-            <img src={`/preguntas/${preguntaActual.imagen_pregunta}`} alt="Imagen pregunta"
-              style={{ maxWidth: '100%', borderRadius: '8px', margin: '1rem 0' }} />
-          )}
-          {preguntaActual.acotacion && (
-            <p style={{ fontWeight: '600', color: '#166534', marginTop: '1rem', fontSize: '1rem' }}>
-              {preguntaActual.acotacion}
-            </p>
-          )}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1.5rem' }}>
-            {opciones.map((opcion) => (
-              <button key={opcion.letra} onClick={() => handleSeleccion(opcion.letra)}
-                style={{
-                  display: 'flex', alignItems: 'flex-start', gap: '1rem',
-                  padding: '12px 16px', borderRadius: '10px', cursor: respondida ? 'default' : 'pointer',
-                  backgroundColor: getColorOpcion(opcion.letra),
-                  border: getBorderOpcion(opcion.letra),
-                  textAlign: 'left', fontSize: '0.95rem', color: '#14532d', transition: 'all 0.2s'
-                }}>
-                <span style={{ fontWeight: '700', minWidth: '20px' }}>{opcion.letra}.</span>
-                <span>{opcion.texto}</span>
-              </button>
-            ))}
+        {loadingPregunta ? (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
+            <p style={{ color: '#166534', fontSize: '1.1rem' }}>Cargando pregunta...</p>
           </div>
-        </div>
-
-        {/* RESPUESTA — solo en modo normal */}
-        {respondida && !modoExamen && (
-          <div style={{ ...cardStyle, marginTop: '1.5rem', borderLeft: '4px solid #16a34a' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-              {seleccion === preguntaActual.respuesta_correcta
-                ? <span style={{ fontSize: '1.1rem', fontWeight: '700', color: '#16a34a' }}>✓ ¡Correcto!</span>
-                : <span style={{ fontSize: '1.1rem', fontWeight: '700', color: '#dc2626' }}>✗ Incorrecto — La respuesta correcta es {preguntaActual.respuesta_correcta}</span>
-              }
+        ) : preguntaActual && (
+          <>
+            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+              <span style={tagStyle}>📍 {preguntaActual.enfoque?.toUpperCase()}</span>
+              <span style={tagStyle}>🧬 {preguntaActual.topico?.charAt(0).toUpperCase() + preguntaActual.topico?.slice(1)}</span>
+              {modoExamen && <span style={{ ...tagStyle, backgroundColor: '#fef9c3', color: '#854d0e' }}>Modo examen</span>}
             </div>
-            <h3 style={{ color: '#14532d', fontSize: '1rem', fontWeight: '700', marginBottom: '0.5rem' }}>Comentario general</h3>
-            <p style={{ color: '#166534', lineHeight: '1.8', fontSize: '0.95rem', whiteSpace: 'pre-line' }}>
-              {preguntaActual.comentario_general}
-            </p>
-            {preguntaActual.imagen_solucion && (
-              <img src={`/preguntas/${preguntaActual.imagen_solucion}`} alt="Imagen solución"
-                style={{ maxWidth: '100%', borderRadius: '8px', margin: '1rem 0' }} />
-            )}
-            {preguntaActual.explicacion_opciones && (
-              <>
-                <h3 style={{ color: '#14532d', fontSize: '1rem', fontWeight: '700', margin: '1rem 0 0.5rem' }}>Explicación por opción</h3>
+
+            <div style={cardStyle}>
+              <p style={{ fontSize: '1rem', lineHeight: '1.8', color: '#14532d', whiteSpace: 'pre-line' }}>
+                {preguntaActual.enunciado}
+              </p>
+              {preguntaActual.imagen_pregunta && (
+                <img src={`/preguntas/${preguntaActual.imagen_pregunta}`} alt="Imagen pregunta"
+                  style={{ maxWidth: '100%', borderRadius: '8px', margin: '1rem 0', pointerEvents: 'none' }} />
+              )}
+              {preguntaActual.acotacion && (
+                <p style={{ fontWeight: '600', color: '#166534', marginTop: '1rem', fontSize: '1rem' }}>
+                  {preguntaActual.acotacion}
+                </p>
+              )}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1.5rem' }}>
+                {opciones.map((opcion) => (
+                  <button key={opcion.letra} onClick={() => handleSeleccion(opcion.letra)}
+                    style={{
+                      display: 'flex', alignItems: 'flex-start', gap: '1rem',
+                      padding: '12px 16px', borderRadius: '10px', cursor: respondida ? 'default' : 'pointer',
+                      backgroundColor: getColorOpcion(opcion.letra),
+                      border: getBorderOpcion(opcion.letra),
+                      textAlign: 'left', fontSize: '0.95rem', color: '#14532d', transition: 'all 0.2s'
+                    }}>
+                    <span style={{ fontWeight: '700', minWidth: '20px' }}>{opcion.letra}.</span>
+                    <span>{opcion.texto}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {respondida && !modoExamen && (
+              <div style={{ ...cardStyle, marginTop: '1.5rem', borderLeft: '4px solid #16a34a' }}>
+                <div style={{ marginBottom: '1rem' }}>
+                  {seleccion === preguntaActual.respuesta_correcta
+                    ? <span style={{ fontSize: '1.1rem', fontWeight: '700', color: '#16a34a' }}>✓ ¡Correcto!</span>
+                    : <span style={{ fontSize: '1.1rem', fontWeight: '700', color: '#dc2626' }}>✗ Incorrecto — La respuesta correcta es {preguntaActual.respuesta_correcta}</span>
+                  }
+                </div>
+                <h3 style={{ color: '#14532d', fontSize: '1rem', fontWeight: '700', marginBottom: '0.5rem' }}>Comentario general</h3>
                 <p style={{ color: '#166534', lineHeight: '1.8', fontSize: '0.95rem', whiteSpace: 'pre-line' }}>
-                  {preguntaActual.explicacion_opciones}
+                  {preguntaActual.comentario_general}
                 </p>
-              </>
-            )}
-            {preguntaActual.objetivo_educativo && (
-              <div style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '1rem', marginTop: '1rem' }}>
-                <h3 style={{ color: '#14532d', fontSize: '1rem', fontWeight: '700', marginBottom: '0.5rem' }}>🎯 Objetivo educativo</h3>
-                <p style={{ color: '#166534', lineHeight: '1.8', fontSize: '0.95rem', whiteSpace: 'pre-line', margin: 0 }}>
-                  {preguntaActual.objetivo_educativo}
-                </p>
+                {preguntaActual.imagen_solucion && (
+                  <img src={`/preguntas/${preguntaActual.imagen_solucion}`} alt="Imagen solución"
+                    style={{ maxWidth: '100%', borderRadius: '8px', margin: '1rem 0', pointerEvents: 'none' }} />
+                )}
+                {preguntaActual.explicacion_opciones && (
+                  <>
+                    <h3 style={{ color: '#14532d', fontSize: '1rem', fontWeight: '700', margin: '1rem 0 0.5rem' }}>Explicación por opción</h3>
+                    <p style={{ color: '#166534', lineHeight: '1.8', fontSize: '0.95rem', whiteSpace: 'pre-line' }}>
+                      {preguntaActual.explicacion_opciones}
+                    </p>
+                  </>
+                )}
+                {preguntaActual.objetivo_educativo && (
+                  <div style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '1rem', marginTop: '1rem' }}>
+                    <h3 style={{ color: '#14532d', fontSize: '1rem', fontWeight: '700', marginBottom: '0.5rem' }}>🎯 Objetivo educativo</h3>
+                    <p style={{ color: '#166534', lineHeight: '1.8', fontSize: '0.95rem', whiteSpace: 'pre-line', margin: 0 }}>
+                      {preguntaActual.objetivo_educativo}
+                    </p>
+                  </div>
+                )}
+                {preguntaActual.bibliografia && (
+                  <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '1rem', marginTop: '1rem' }}>
+                    <h3 style={{ color: '#475569', fontSize: '0.9rem', fontWeight: '700', marginBottom: '0.5rem' }}>📚 Bibliografía</h3>
+                    <p style={{ color: '#64748b', lineHeight: '1.8', fontSize: '0.85rem', whiteSpace: 'pre-line', margin: 0 }}>
+                      {preguntaActual.bibliografia}
+                    </p>
+                  </div>
+                )}
               </div>
             )}
-            {preguntaActual.bibliografia && (
-              <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '1rem', marginTop: '1rem' }}>
-                <h3 style={{ color: '#475569', fontSize: '0.9rem', fontWeight: '700', marginBottom: '0.5rem' }}>📚 Bibliografía</h3>
-                <p style={{ color: '#64748b', lineHeight: '1.8', fontSize: '0.85rem', whiteSpace: 'pre-line', margin: 0 }}>
-                  {preguntaActual.bibliografia}
-                </p>
+
+            {respondida && (
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', flexWrap: 'wrap' }}>
+                {indice > 0 && <button onClick={handleAnterior} style={btnSecStyle}>← Anterior</button>}
+                {indice + 1 < idsActivos.length && <button onClick={handleSiguiente} style={btnPrimaryStyle}>Siguiente →</button>}
+                <button onClick={() => navigate(-1)} style={btnSecStyle}>Volver</button>
+                <button onClick={handleFinalizar} style={btnSecStyle}>Finalizar</button>
               </div>
             )}
-          </div>
+          </>
         )}
-
-        {/* BOTONES */}
-        {respondida && (
-          <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', flexWrap: 'wrap' }}>
-            {indice > 0 && (
-              <button onClick={handleAnterior} style={btnSecStyle}>← Anterior</button>
-            )}
-            {indice + 1 < preguntasActivas.length && (
-              <button onClick={handleSiguiente} style={btnPrimaryStyle}>Siguiente →</button>
-            )}
-            <button onClick={() => navigate(-1)} style={btnSecStyle}>Volver</button>
-            <button onClick={handleFinalizar} style={btnSecStyle}>Finalizar</button>
-          </div>
-        )}
-
       </div>
     </div>
   )
