@@ -5,33 +5,40 @@ const areas = {
     nombre: 'Fisiología',
     subtopicos: [
       { id: 'fisiologia_celular', nombre: 'Fisiología Celular', imagen: '/topicos/fisiologia_celular.jpg', disponible: true },
-      { id: 'neurologia', nombre: 'Neurología', imagen: '/topicos/neurologia.jpg', disponible: false },
+      { id: 'fisiologia_nerviosa', nombre: 'Fisiología Nerviosa', imagen: '/topicos/neurologia.jpg', disponible: false },
+      { id: 'fisiologia_renal', nombre: 'Fisiología Renal', imagen: '/topicos/nefrologia.jpg', disponible: false },
     ]
   },
   fisiopatologia: {
     nombre: 'Fisiopatología',
     subtopicos: [
-      { id: 'nefrologia', nombre: 'Nefrología', imagen: '/topicos/nefrologia.jpg', disponible: true },
       { id: 'reumatologia', nombre: 'Reumatología', imagen: '/topicos/reumatologia.jpg', disponible: true },
-      { id: 'gastroenterologia', nombre: 'Gastroenterología', imagen: '/topicos/gastroenterologia.jpg', disponible: true },
+      { id: 'nefrologia', nombre: 'Renal', imagen: '/topicos/nefrologia.jpg', disponible: true },
+      { id: 'gastroenterologia', nombre: 'Gastrointestinal', imagen: '/topicos/gastroenterologia.jpg', disponible: true },
     ]
   },
   anatomia: {
     nombre: 'Anatomía',
     subtopicos: [
-      { id: 'anatomia_cv', nombre: 'Anatomía Cardiovascular', imagen: '/topicos/anatomia_cv.jpg', disponible: false },
+      { id: 'anatomia_general', nombre: 'Anatomía General', imagen: '/topicos/anatomia.jpg', disponible: false },
     ]
   },
   histologia: {
     nombre: 'Histología',
     subtopicos: [
-      { id: 'histologia_cv', nombre: 'Histología Cardiovascular', imagen: '/topicos/histologia_cv.jpg', disponible: false },
+      { id: 'histologia_general', nombre: 'Histología General', imagen: '/topicos/histologia.jpg', disponible: false },
     ]
   },
   embriologia: {
     nombre: 'Embriología',
     subtopicos: [
-      { id: 'embriologia_cv', nombre: 'Embriología Cardiovascular', imagen: '/topicos/embriologia_cv.jpg', disponible: false },
+      { id: 'embriologia_general', nombre: 'Embriología General', imagen: '/topicos/embriologia.jpg', disponible: false },
+    ]
+  },
+  medicina_interna: {
+    nombre: 'Medicina Interna',
+    subtopicos: [
+      { id: 'medicina_interna_general', nombre: 'Medicina Interna', imagen: '/topicos/medicina_interna.jpg', disponible: false },
     ]
   },
 }

@@ -7,6 +7,7 @@ const areas = [
   { id: 'anatomia', nombre: 'Anatomía', imagen: '/topicos/anatomia.jpg', disponible: false },
   { id: 'histologia', nombre: 'Histología', imagen: '/topicos/histologia.jpg', disponible: false },
   { id: 'embriologia', nombre: 'Embriología', imagen: '/topicos/embriologia.jpg', disponible: false },
+  { id: 'medicina_interna', nombre: 'Medicina Interna', imagen: '/topicos/medicina_interna.jpg', disponible: false },
 ]
 
 function Topics() {
