@@ -8,6 +8,7 @@ function Dashboard() {
   const [stats, setStats] = useState(null)
   const [porTopico, setPorTopico] = useState([])
   const [recientes, setRecientes] = useState([])
+  const [semana, setSemana] = useState([])
 
   useEffect(() => {
     cargarDatos()
@@ -29,7 +30,6 @@ function Dashboard() {
       const correctas = data.filter(r => r.correcta).length
       const incorrectas = total - correctas
       const porcentaje = total > 0 ? Math.round((correctas / total) * 100) : 0
-
       setStats({ total, correctas, incorrectas, porcentaje })
 
       // Por tópico
@@ -40,14 +40,12 @@ function Dashboard() {
         if (r.correcta) topicos[r.topico].correctas++
       })
       const topicosArr = Object.entries(topicos).map(([topico, d]) => ({
-        topico,
-        total: d.total,
-        correctas: d.correctas,
+        topico, total: d.total, correctas: d.correctas,
         porcentaje: Math.round((d.correctas / d.total) * 100)
       })).sort((a, b) => b.total - a.total)
       setPorTopico(topicosArr)
 
-      // Últimas 5 sesiones agrupadas por día
+      // Últimas 5 sesiones por día
       const porDia = {}
       data.forEach(r => {
         const dia = r.created_at.split('T')[0]
@@ -59,6 +57,31 @@ function Dashboard() {
         .map(([dia, d]) => ({ dia, ...d, porcentaje: Math.round((d.correctas / d.total) * 100) }))
         .slice(0, 5)
       setRecientes(diasArr)
+
+      // SEMANA ACTUAL
+      const hoy = new Date()
+      const diaSemana = hoy.getDay() // 0=dom, 1=lun...
+      const lunes = new Date(hoy)
+      lunes.setDate(hoy.getDate() - ((diaSemana + 6) % 7))
+
+      const diasSemana = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
+      const semanaData = diasSemana.map((nombre, i) => {
+        const fecha = new Date(lunes)
+        fecha.setDate(lunes.getDate() + i)
+        const fechaStr = fecha.toISOString().split('T')[0]
+        const hoySt = hoy.toISOString().split('T')[0]
+        const esFuturo = fechaStr > hoySt
+        const esHoy = fechaStr === hoySt
+
+        const registros = data.filter(r => r.created_at.split('T')[0] === fechaStr)
+        const preguntas = registros.length
+        const correctasDia = registros.filter(r => r.correcta).length
+        const minutos = Math.round(preguntas * 2)
+        const pct = preguntas > 0 ? Math.round((correctasDia / preguntas) * 100) : 0
+
+        return { nombre, fecha: fechaStr, esHoy, esFuturo, preguntas, minutos, pct, activo: preguntas > 0 }
+      })
+      setSemana(semanaData)
     }
     setLoading(false)
   }
@@ -86,7 +109,6 @@ function Dashboard() {
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f0faf4', fontFamily: 'Segoe UI, sans-serif' }}>
 
-      {/* NAVBAR */}
       <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 2.5rem', backgroundColor: '#166534', boxShadow: '0 2px 10px rgba(0,0,0,0.2)' }}>
         <h1 style={{ color: 'white', fontSize: '1.5rem', fontWeight: '800', margin: 0 }}>HIGH YIELDS</h1>
         <div style={{ display: 'flex', gap: '1rem' }}>
@@ -102,6 +124,44 @@ function Dashboard() {
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '2.5rem 2rem' }}>
         <h2 style={{ color: '#14532d', fontSize: '2rem', fontWeight: '800', marginBottom: '0.5rem' }}>Mi progreso</h2>
         <p style={{ color: '#16a34a', marginBottom: '2rem' }}>Resumen de tu desempeño en High Yields</p>
+
+        {/* CALENDARIO SEMANAL */}
+        <div style={{ backgroundColor: 'white', borderRadius: '16px', padding: '1.5rem', marginBottom: '1.5rem', boxShadow: '0 4px 20px rgba(22,101,52,0.08)' }}>
+          <h3 style={{ color: '#14532d', fontSize: '1rem', fontWeight: '700', marginBottom: '1.2rem' }}>📅 Esta semana</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.5rem' }}>
+            {semana.map((dia, i) => (
+              <div key={i} style={{ textAlign: 'center' }}>
+                <p style={{ fontSize: '0.75rem', fontWeight: '600', color: dia.esHoy ? '#166534' : '#9ca3af', marginBottom: '0.4rem' }}>
+                  {dia.nombre}
+                </p>
+                <div style={{
+                  width: '100%', aspectRatio: '1', borderRadius: '10px', display: 'flex',
+                  flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                  backgroundColor: dia.esFuturo ? '#f9fafb' : dia.activo ? '#dcfce7' : '#f3f4f6',
+                  border: dia.esHoy ? '2px solid #16a34a' : '1.5px solid transparent',
+                  padding: '4px'
+                }}>
+                  {dia.esFuturo ? (
+                    <span style={{ fontSize: '1rem', color: '#d1d5db' }}>—</span>
+                  ) : dia.activo ? (
+                    <>
+                      <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#16a34a' }}>✓</span>
+                      <span style={{ fontSize: '0.65rem', color: '#166534', fontWeight: '600' }}>{dia.minutos}m</span>
+                      <span style={{ fontSize: '0.6rem', color: getMensaje(dia.pct).color, fontWeight: '600' }}>{dia.pct}%</span>
+                    </>
+                  ) : (
+                    <span style={{ fontSize: '1rem', color: '#d1d5db' }}>—</span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{ display: 'flex', gap: '1.5rem', marginTop: '1rem', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '0.75rem', color: '#166534' }}>✓ Verde = estudió ese día</span>
+            <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>m = minutos estimados</span>
+            <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>% = aciertos del día</span>
+          </div>
+        </div>
 
         {!stats || stats.total === 0 ? (
           <div style={{ backgroundColor: 'white', borderRadius: '16px', padding: '3rem', textAlign: 'center', boxShadow: '0 4px 20px rgba(22,101,52,0.1)' }}>
@@ -137,11 +197,7 @@ function Dashboard() {
                 <span style={{ color: getMensaje(stats.porcentaje).color, fontWeight: '700' }}>{getMensaje(stats.porcentaje).texto}</span>
               </div>
               <div style={{ backgroundColor: '#dcfce7', borderRadius: '999px', height: '16px', overflow: 'hidden' }}>
-                <div style={{
-                  height: '100%', borderRadius: '999px', transition: 'width 1s ease',
-                  width: `${stats.porcentaje}%`,
-                  backgroundColor: getMensaje(stats.porcentaje).color
-                }} />
+                <div style={{ height: '100%', borderRadius: '999px', transition: 'width 1s ease', width: `${stats.porcentaje}%`, backgroundColor: getMensaje(stats.porcentaje).color }} />
               </div>
               <p style={{ color: '#166534', fontSize: '0.85rem', marginTop: '0.5rem' }}>
                 {stats.correctas} de {stats.total} preguntas correctas
@@ -158,12 +214,7 @@ function Dashboard() {
                     <span style={{ color: getMensaje(t.porcentaje).color, fontSize: '0.9rem', fontWeight: '700' }}>{t.porcentaje}% — {t.total} preguntas</span>
                   </div>
                   <div style={{ backgroundColor: '#dcfce7', borderRadius: '999px', height: '10px', overflow: 'hidden' }}>
-                    <div style={{
-                      height: '100%', borderRadius: '999px',
-                      width: `${t.porcentaje}%`,
-                      backgroundColor: getMensaje(t.porcentaje).color,
-                      transition: 'width 1s ease'
-                    }} />
+                    <div style={{ height: '100%', borderRadius: '999px', width: `${t.porcentaje}%`, backgroundColor: getMensaje(t.porcentaje).color, transition: 'width 1s ease' }} />
                   </div>
                 </div>
               ))}
@@ -176,7 +227,7 @@ function Dashboard() {
                 {recientes.map((r, i) => (
                   <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: i < recientes.length - 1 ? '1px solid #f0fdf4' : 'none' }}>
                     <span style={{ color: '#166534', fontSize: '0.9rem' }}>{formatFecha(r.dia)}</span>
-                    <span style={{ color: '#166534', fontSize: '0.9rem' }}>{r.total} preguntas</span>
+                    <span style={{ color: '#166534', fontSize: '0.9rem' }}>{r.total} preguntas — {r.total * 2} min</span>
                     <span style={{ color: getMensaje(r.porcentaje).color, fontWeight: '700', fontSize: '0.9rem' }}>{r.porcentaje}% aciertos</span>
                   </div>
                 ))}
