@@ -1,6 +1,19 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import ReactMarkdown from 'react-markdown'
+import remarkMath from 'remark-math'
+import rehypeKatex from 'rehype-katex'
+import 'katex/dist/katex.min.css'
+
+const mdProps = {
+  remarkPlugins: [remarkMath],
+  rehypePlugins: [rehypeKatex],
+}
+
+const mdStyle = {
+  color: '#166534', lineHeight: '1.8', fontSize: '0.95rem'
+}
 
 function Questions() {
   const { topico } = useParams()
@@ -181,7 +194,6 @@ function Questions() {
         <p style={{ color: '#166534', fontSize: '0.95rem', marginBottom: '2rem' }}>
           Hay <strong>{totalDisponible}</strong> preguntas disponibles.
         </p>
-
         <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '600', color: '#166534', marginBottom: '0.5rem' }}>
           ¿Cuántas preguntas?
         </label>
@@ -192,7 +204,6 @@ function Questions() {
           ))}
           <option value={totalDisponible}>Todas ({totalDisponible})</option>
         </select>
-
         <div style={{ backgroundColor: '#f0fdf4', border: '1.5px solid #bbf7d0', borderRadius: '12px', padding: '1.2rem', marginBottom: '1.5rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: modoExamen ? '1rem' : 0 }}>
             <div>
@@ -218,7 +229,6 @@ function Questions() {
             </>
           )}
         </div>
-
         <button onClick={iniciarSesion}
           style={{ width: '100%', backgroundColor: '#16a34a', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontSize: '1rem', fontWeight: '600', cursor: 'pointer' }}>
           {modoExamen ? '🎯 Iniciar examen' : 'Comenzar →'}
@@ -245,6 +255,12 @@ function Questions() {
           -ms-user-select: none;
           user-select: none;
         }
+        .md-content p { margin: 0.4rem 0; }
+        .md-content ul, .md-content ol { padding-left: 1.5rem; margin: 0.5rem 0; }
+        .md-content table { border-collapse: collapse; width: 100%; margin: 0.5rem 0; }
+        .md-content th, .md-content td { border: 1px solid #bbf7d0; padding: 6px 12px; text-align: left; }
+        .md-content th { background-color: #f0fdf4; font-weight: 700; }
+        .md-content strong { color: #14532d; }
       `}</style>
 
       <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 2.5rem', backgroundColor: '#166534', boxShadow: '0 2px 10px rgba(0,0,0,0.2)' }}>
@@ -273,7 +289,6 @@ function Questions() {
       )}
 
       <div className="no-select" style={{ maxWidth: '860px', margin: '0 auto', padding: '2rem' }}>
-
         {loadingPregunta ? (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
             <p style={{ color: '#166534', fontSize: '1.1rem' }}>Cargando pregunta...</p>
@@ -328,9 +343,9 @@ function Questions() {
                   }
                 </div>
                 <h3 style={{ color: '#14532d', fontSize: '1rem', fontWeight: '700', marginBottom: '0.5rem' }}>Comentario general</h3>
-                <p style={{ color: '#166534', lineHeight: '1.8', fontSize: '0.95rem', whiteSpace: 'pre-line' }}>
-                  {preguntaActual.comentario_general}
-                </p>
+                <div className="md-content" style={mdStyle}>
+                  <ReactMarkdown {...mdProps}>{preguntaActual.comentario_general}</ReactMarkdown>
+                </div>
                 {preguntaActual.imagen_solucion && (
                   <img src={`/soluciones/${preguntaActual.imagen_solucion}`} alt="Imagen solución"
                     style={{ maxWidth: '100%', borderRadius: '8px', margin: '1rem 0', pointerEvents: 'none' }} />
@@ -338,25 +353,25 @@ function Questions() {
                 {preguntaActual.explicacion_opciones && (
                   <>
                     <h3 style={{ color: '#14532d', fontSize: '1rem', fontWeight: '700', margin: '1rem 0 0.5rem' }}>Explicación por opción</h3>
-                    <p style={{ color: '#166534', lineHeight: '1.8', fontSize: '0.95rem', whiteSpace: 'pre-line' }}>
-                      {preguntaActual.explicacion_opciones}
-                    </p>
+                    <div className="md-content" style={mdStyle}>
+                      <ReactMarkdown {...mdProps}>{preguntaActual.explicacion_opciones}</ReactMarkdown>
+                    </div>
                   </>
                 )}
                 {preguntaActual.objetivo_educativo && (
                   <div style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '1rem', marginTop: '1rem' }}>
                     <h3 style={{ color: '#14532d', fontSize: '1rem', fontWeight: '700', marginBottom: '0.5rem' }}>🎯 Objetivo educativo</h3>
-                    <p style={{ color: '#166534', lineHeight: '1.8', fontSize: '0.95rem', whiteSpace: 'pre-line', margin: 0 }}>
-                      {preguntaActual.objetivo_educativo}
-                    </p>
+                    <div className="md-content" style={{ ...mdStyle, margin: 0 }}>
+                      <ReactMarkdown {...mdProps}>{preguntaActual.objetivo_educativo}</ReactMarkdown>
+                    </div>
                   </div>
                 )}
                 {preguntaActual.bibliografia && (
                   <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '1rem', marginTop: '1rem' }}>
                     <h3 style={{ color: '#475569', fontSize: '0.9rem', fontWeight: '700', marginBottom: '0.5rem' }}>📚 Bibliografía</h3>
-                    <p style={{ color: '#64748b', lineHeight: '1.8', fontSize: '0.85rem', whiteSpace: 'pre-line', margin: 0 }}>
-                      {preguntaActual.bibliografia}
-                    </p>
+                    <div className="md-content" style={{ ...mdStyle, fontSize: '0.85rem', color: '#64748b', margin: 0 }}>
+                      <ReactMarkdown {...mdProps}>{preguntaActual.bibliografia}</ReactMarkdown>
+                    </div>
                   </div>
                 )}
               </div>
