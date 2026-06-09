@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
@@ -15,10 +15,27 @@ function Questions() {
   const [historial, setHistorial] = useState([])
   const [configurando, setConfigurando] = useState(true)
   const [totalSeleccionado, setTotalSeleccionado] = useState(10)
+  const [modoExamen, setModoExamen] = useState(false)
+  const [tiempoTotal, setTiempoTotal] = useState(30)
+  const [tiempoRestante, setTiempoRestante] = useState(null)
+  const timerRef = useRef(null)
 
   useEffect(() => {
     cargarPreguntas()
   }, [topico])
+
+  useEffect(() => {
+    if (tiempoRestante === null) return
+    if (tiempoRestante <= 0) {
+      clearInterval(timerRef.current)
+      handleFinalizar()
+      return
+    }
+    timerRef.current = setInterval(() => {
+      setTiempoRestante(prev => prev - 1)
+    }, 1000)
+    return () => clearInterval(timerRef.current)
+  }, [tiempoRestante])
 
   const cargarPreguntas = async () => {
     setLoading(true)
@@ -26,11 +43,13 @@ function Questions() {
       .from('preguntas')
       .select('*')
       .eq('topico', topico)
-    if (!error) {
-      const shuffled = data.sort(() => Math.random() - 0.5)
-      setPreguntas(shuffled)
-    }
+    if (!error) setPreguntas(data.sort(() => Math.random() - 0.5))
     setLoading(false)
+  }
+
+  const iniciarSesion = () => {
+    setConfigurando(false)
+    if (modoExamen) setTiempoRestante(tiempoTotal * 60)
   }
 
   const preguntasActivas = preguntas.slice(0, totalSeleccionado)
@@ -50,21 +69,15 @@ function Questions() {
     setSeleccion(letra)
     setRespondida(true)
     const correcta = letra === preguntaActual.respuesta_correcta
-    const nuevasRespuestas = [...respuestas, { id: preguntaActual.id, correcta }]
-    setRespuestas(nuevasRespuestas)
+    setRespuestas([...respuestas, { id: preguntaActual.id, correcta }])
     setHistorial([...historial, { seleccion: letra, respondida: true }])
   }
 
   const handleSiguiente = () => {
     setIndice(indice + 1)
     const sig = historial[indice + 1]
-    if (sig) {
-      setSeleccion(sig.seleccion)
-      setRespondida(sig.respondida)
-    } else {
-      setSeleccion(null)
-      setRespondida(false)
-    }
+    if (sig) { setSeleccion(sig.seleccion); setRespondida(sig.respondida) }
+    else { setSeleccion(null); setRespondida(false) }
   }
 
   const handleAnterior = () => {
@@ -75,13 +88,25 @@ function Questions() {
   }
 
   const handleFinalizar = () => {
-    navigate('/stats', {
-      state: { respuestas, total: preguntasActivas.length }
-    })
+    clearInterval(timerRef.current)
+    navigate('/stats', { state: { respuestas, total: preguntasActivas.length, modoExamen } })
+  }
+
+  const formatTiempo = (seg) => {
+    const m = Math.floor(seg / 60).toString().padStart(2, '0')
+    const s = (seg % 60).toString().padStart(2, '0')
+    return `${m}:${s}`
+  }
+
+  const getColorTimer = () => {
+    if (tiempoRestante > tiempoTotal * 60 * 0.5) return '#86efac'
+    if (tiempoRestante > tiempoTotal * 60 * 0.25) return '#fde047'
+    return '#f87171'
   }
 
   const getColorOpcion = (letra) => {
     if (!respondida) return '#fff'
+    if (modoExamen) return seleccion === letra ? '#fef9c3' : '#fff'
     if (letra === preguntaActual.respuesta_correcta) return '#dcfce7'
     if (letra === seleccion) return '#fee2e2'
     return '#fff'
@@ -89,6 +114,7 @@ function Questions() {
 
   const getBorderOpcion = (letra) => {
     if (!respondida) return seleccion === letra ? '2px solid #16a34a' : '1.5px solid #d1fae5'
+    if (modoExamen) return seleccion === letra ? '2px solid #ca8a04' : '1.5px solid #d1fae5'
     if (letra === preguntaActual.respuesta_correcta) return '2px solid #16a34a'
     if (letra === seleccion) return '2px solid #dc2626'
     return '1.5px solid #d1fae5'
@@ -112,31 +138,67 @@ function Questions() {
       <div style={{ backgroundColor: 'white', borderRadius: '16px', padding: '2.5rem', maxWidth: '480px', width: '100%', boxShadow: '0 10px 40px rgba(22,101,52,0.12)' }}>
         <h2 style={{ color: '#14532d', fontSize: '1.6rem', fontWeight: '800', marginBottom: '0.5rem' }}>Configurar sesión</h2>
         <p style={{ color: '#166534', fontSize: '0.95rem', marginBottom: '2rem' }}>
-          Hay <strong>{preguntas.length}</strong> preguntas disponibles en este tópico.
+          Hay <strong>{preguntas.length}</strong> preguntas disponibles.
         </p>
 
         <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '600', color: '#166534', marginBottom: '0.5rem' }}>
-          ¿Cuántas preguntas quieres responder?
+          ¿Cuántas preguntas?
         </label>
         <select
           value={totalSeleccionado}
           onChange={e => setTotalSeleccionado(Number(e.target.value))}
-          style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1.5px solid #bbf7d0', fontSize: '1rem', color: '#14532d', marginBottom: '2rem', outline: 'none' }}
-        >
+          style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1.5px solid #bbf7d0', fontSize: '1rem', color: '#14532d', marginBottom: '1.5rem', outline: 'none' }}>
           {[5, 10, 15, 20, 25, 30].filter(n => n <= preguntas.length).map(n => (
             <option key={n} value={n}>{n} preguntas</option>
           ))}
           <option value={preguntas.length}>Todas ({preguntas.length})</option>
         </select>
 
-        <button
-          onClick={() => setConfigurando(false)}
-          style={{ width: '100%', backgroundColor: '#16a34a', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontSize: '1rem', fontWeight: '600', cursor: 'pointer' }}>
-          Comenzar →
-        </button>
+        {/* MODO EXAMEN */}
+        <div style={{ backgroundColor: '#f0fdf4', border: '1.5px solid #bbf7d0', borderRadius: '12px', padding: '1.2rem', marginBottom: '1.5rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: modoExamen ? '1rem' : 0 }}>
+            <div>
+              <p style={{ color: '#14532d', fontWeight: '700', fontSize: '0.95rem', margin: 0 }}>⏱️ Modo examen</p>
+              <p style={{ color: '#166534', fontSize: '0.8rem', margin: '2px 0 0' }}>Sin explicaciones, con temporizador</p>
+            </div>
+            <div
+              onClick={() => setModoExamen(!modoExamen)}
+              style={{
+                width: '48px', height: '26px', borderRadius: '999px', cursor: 'pointer',
+                backgroundColor: modoExamen ? '#16a34a' : '#d1fae5',
+                position: 'relative', transition: 'background 0.2s'
+              }}>
+              <div style={{
+                width: '20px', height: '20px', borderRadius: '50%', backgroundColor: 'white',
+                position: 'absolute', top: '3px',
+                left: modoExamen ? '25px' : '3px', transition: 'left 0.2s',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.2)'
+              }} />
+            </div>
+          </div>
 
-        <button
-          onClick={() => navigate(-1)}
+          {modoExamen && (
+            <>
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#166534', marginBottom: '0.5rem' }}>
+                Tiempo total (minutos)
+              </label>
+              <select
+                value={tiempoTotal}
+                onChange={e => setTiempoTotal(Number(e.target.value))}
+                style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1.5px solid #bbf7d0', fontSize: '1rem', color: '#14532d', outline: 'none' }}>
+                {[10, 15, 20, 30, 45, 60, 90].map(n => (
+                  <option key={n} value={n}>{n} minutos</option>
+                ))}
+              </select>
+            </>
+          )}
+        </div>
+
+        <button onClick={iniciarSesion}
+          style={{ width: '100%', backgroundColor: '#16a34a', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontSize: '1rem', fontWeight: '600', cursor: 'pointer' }}>
+          {modoExamen ? '🎯 Iniciar examen' : 'Comenzar →'}
+        </button>
+        <button onClick={() => navigate(-1)}
           style={{ width: '100%', marginTop: '0.75rem', backgroundColor: 'transparent', color: '#166534', border: '1.5px solid #16a34a', padding: '12px', borderRadius: '8px', fontSize: '1rem', cursor: 'pointer' }}>
           Cancelar
         </button>
@@ -144,10 +206,7 @@ function Questions() {
     </div>
   )
 
-  if (indice >= preguntasActivas.length) {
-    handleFinalizar()
-    return null
-  }
+  if (indice >= preguntasActivas.length) { handleFinalizar(); return null }
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f0faf4', fontFamily: 'Segoe UI, sans-serif' }}>
@@ -156,43 +215,51 @@ function Questions() {
       <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 2.5rem', backgroundColor: '#166534', boxShadow: '0 2px 10px rgba(0,0,0,0.2)' }}>
         <h1 style={{ color: 'white', fontSize: '1.5rem', fontWeight: '800', margin: 0 }}>HIGH YIELDS</h1>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          {modoExamen && tiempoRestante !== null && (
+            <span style={{ color: getColorTimer(), fontSize: '1.1rem', fontWeight: '700', letterSpacing: '0.05em' }}>
+              ⏱️ {formatTiempo(tiempoRestante)}
+            </span>
+          )}
           <span style={{ color: '#86efac', fontSize: '0.9rem' }}>
             Pregunta {indice + 1} de {preguntasActivas.length}
           </span>
           <button onClick={handleFinalizar} style={{ backgroundColor: 'transparent', border: '1.5px solid white', color: 'white', padding: '8px 20px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.9rem' }}>
-            Finalizar estudio
+            Finalizar
           </button>
         </div>
       </nav>
 
-      {/* CONTENIDO */}
+      {/* BANNER MODO EXAMEN */}
+      {modoExamen && (
+        <div style={{ backgroundColor: '#fef9c3', borderBottom: '1px solid #fde047', padding: '8px', textAlign: 'center' }}>
+          <span style={{ color: '#854d0e', fontSize: '0.85rem', fontWeight: '600' }}>
+            🎯 Modo examen activo — Las explicaciones se mostrarán al finalizar
+          </span>
+        </div>
+      )}
+
       <div style={{ maxWidth: '860px', margin: '0 auto', padding: '2rem' }}>
 
-        {/* INFO PREGUNTA */}
         <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
           <span style={tagStyle}>📍 {preguntaActual.enfoque?.toUpperCase()}</span>
           <span style={tagStyle}>🧬 {preguntaActual.topico?.charAt(0).toUpperCase() + preguntaActual.topico?.slice(1)}</span>
           <span style={tagStyle}>ID: Pregunta N°{preguntaActual.id}</span>
+          {modoExamen && <span style={{ ...tagStyle, backgroundColor: '#fef9c3', color: '#854d0e' }}>Modo examen</span>}
         </div>
 
-        {/* TARJETA PREGUNTA */}
         <div style={cardStyle}>
           <p style={{ fontSize: '1rem', lineHeight: '1.8', color: '#14532d', whiteSpace: 'pre-line' }}>
             {preguntaActual.enunciado}
           </p>
-
           {preguntaActual.imagen_pregunta && (
             <img src={`/preguntas/${preguntaActual.imagen_pregunta}`} alt="Imagen pregunta"
               style={{ maxWidth: '100%', borderRadius: '8px', margin: '1rem 0' }} />
           )}
-
           {preguntaActual.acotacion && (
             <p style={{ fontWeight: '600', color: '#166534', marginTop: '1rem', fontSize: '1rem' }}>
               {preguntaActual.acotacion}
             </p>
           )}
-
-          {/* OPCIONES */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1.5rem' }}>
             {opciones.map((opcion) => (
               <button key={opcion.letra} onClick={() => handleSeleccion(opcion.letra)}
@@ -210,27 +277,23 @@ function Questions() {
           </div>
         </div>
 
-        {/* SECCION RESPUESTA */}
-        {respondida && (
+        {/* RESPUESTA — solo en modo normal */}
+        {respondida && !modoExamen && (
           <div style={{ ...cardStyle, marginTop: '1.5rem', borderLeft: '4px solid #16a34a' }}>
-
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
               {seleccion === preguntaActual.respuesta_correcta
                 ? <span style={{ fontSize: '1.1rem', fontWeight: '700', color: '#16a34a' }}>✓ ¡Correcto!</span>
                 : <span style={{ fontSize: '1.1rem', fontWeight: '700', color: '#dc2626' }}>✗ Incorrecto — La respuesta correcta es {preguntaActual.respuesta_correcta}</span>
               }
             </div>
-
             <h3 style={{ color: '#14532d', fontSize: '1rem', fontWeight: '700', marginBottom: '0.5rem' }}>Comentario general</h3>
             <p style={{ color: '#166534', lineHeight: '1.8', fontSize: '0.95rem', whiteSpace: 'pre-line' }}>
               {preguntaActual.comentario_general}
             </p>
-
             {preguntaActual.imagen_solucion && (
               <img src={`/preguntas/${preguntaActual.imagen_solucion}`} alt="Imagen solución"
                 style={{ maxWidth: '100%', borderRadius: '8px', margin: '1rem 0' }} />
             )}
-
             {preguntaActual.explicacion_opciones && (
               <>
                 <h3 style={{ color: '#14532d', fontSize: '1rem', fontWeight: '700', margin: '1rem 0 0.5rem' }}>Explicación por opción</h3>
@@ -239,7 +302,6 @@ function Questions() {
                 </p>
               </>
             )}
-
             {preguntaActual.objetivo_educativo && (
               <div style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '1rem', marginTop: '1rem' }}>
                 <h3 style={{ color: '#14532d', fontSize: '1rem', fontWeight: '700', marginBottom: '0.5rem' }}>🎯 Objetivo educativo</h3>
@@ -248,7 +310,6 @@ function Questions() {
                 </p>
               </div>
             )}
-
             {preguntaActual.bibliografia && (
               <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '1rem', marginTop: '1rem' }}>
                 <h3 style={{ color: '#475569', fontSize: '0.9rem', fontWeight: '700', marginBottom: '0.5rem' }}>📚 Bibliografía</h3>
@@ -257,27 +318,20 @@ function Questions() {
                 </p>
               </div>
             )}
+          </div>
+        )}
 
-            {/* BOTONES */}
-            <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', flexWrap: 'wrap' }}>
-              {indice > 0 && (
-                <button onClick={handleAnterior} style={btnSecStyle}>
-                  ← Pregunta anterior
-                </button>
-              )}
-              {indice + 1 < preguntasActivas.length && (
-                <button onClick={handleSiguiente} style={btnPrimaryStyle}>
-                  Siguiente pregunta →
-                </button>
-              )}
-              <button onClick={() => navigate(-1)} style={btnSecStyle}>
-                Volver a tópicos
-              </button>
-              <button onClick={handleFinalizar} style={btnSecStyle}>
-                Finalizar estudio
-              </button>
-            </div>
-
+        {/* BOTONES */}
+        {respondida && (
+          <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', flexWrap: 'wrap' }}>
+            {indice > 0 && (
+              <button onClick={handleAnterior} style={btnSecStyle}>← Anterior</button>
+            )}
+            {indice + 1 < preguntasActivas.length && (
+              <button onClick={handleSiguiente} style={btnPrimaryStyle}>Siguiente →</button>
+            )}
+            <button onClick={() => navigate(-1)} style={btnSecStyle}>Volver</button>
+            <button onClick={handleFinalizar} style={btnSecStyle}>Finalizar</button>
           </div>
         )}
 
@@ -286,23 +340,9 @@ function Questions() {
   )
 }
 
-const cardStyle = {
-  backgroundColor: 'white', borderRadius: '16px', padding: '2rem',
-  boxShadow: '0 4px 20px rgba(22,101,52,0.1)'
-}
-const tagStyle = {
-  backgroundColor: '#dcfce7', color: '#166534', fontSize: '0.8rem',
-  fontWeight: '600', padding: '4px 12px', borderRadius: '999px'
-}
-const btnPrimaryStyle = {
-  backgroundColor: '#16a34a', color: 'white', border: 'none',
-  padding: '12px 28px', borderRadius: '8px', fontSize: '1rem',
-  fontWeight: '600', cursor: 'pointer'
-}
-const btnSecStyle = {
-  backgroundColor: 'transparent', color: '#166634',
-  border: '1.5px solid #16a34a', padding: '12px 28px',
-  borderRadius: '8px', fontSize: '1rem', cursor: 'pointer'
-}
+const cardStyle = { backgroundColor: 'white', borderRadius: '16px', padding: '2rem', boxShadow: '0 4px 20px rgba(22,101,52,0.1)' }
+const tagStyle = { backgroundColor: '#dcfce7', color: '#166534', fontSize: '0.8rem', fontWeight: '600', padding: '4px 12px', borderRadius: '999px' }
+const btnPrimaryStyle = { backgroundColor: '#16a34a', color: 'white', border: 'none', padding: '12px 28px', borderRadius: '8px', fontSize: '1rem', fontWeight: '600', cursor: 'pointer' }
+const btnSecStyle = { backgroundColor: 'transparent', color: '#166534', border: '1.5px solid #16a34a', padding: '12px 28px', borderRadius: '8px', fontSize: '1rem', cursor: 'pointer' }
 
 export default Questions

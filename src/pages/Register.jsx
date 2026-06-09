@@ -110,7 +110,12 @@ function Register() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1.2rem' }}>
           <input type="checkbox" name="terms" id="terms" onChange={handleChange} />
           <label htmlFor="terms" style={{ fontSize: '0.85rem', color: '#166534' }}>
-            Acepto los <span style={{ textDecoration: 'underline', cursor: 'pointer' }}>términos y condiciones</span>
+            Acepto los{' '}
+            <span
+              onClick={() => window.open('/terminos', '_blank')}
+              style={{ textDecoration: 'underline', cursor: 'pointer', fontWeight: '600' }}>
+              términos y condiciones
+            </span>
           </label>
         </div>
 

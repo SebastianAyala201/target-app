@@ -8,6 +8,7 @@ import Questions from './pages/Questions'
 import Stats from './pages/Stats'
 import ProtectedRoute from './components/ProtectedRoute'
 import AutorizadoRoute from './components/AutorizadoRoute'
+import Terminos from './pages/Terminos'
 
 function App() {
   return (
@@ -35,6 +36,8 @@ function App() {
           <AutorizadoRoute>
             <Stats />
           </AutorizadoRoute>
+        } />
+        <Route path="/terminos" element={<Terminos />
         } />
       </Routes>
     </BrowserRouter>
