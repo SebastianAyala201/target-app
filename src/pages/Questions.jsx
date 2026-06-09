@@ -295,7 +295,7 @@ function Questions() {
               </p>
               {preguntaActual.imagen_pregunta && (
                 <img src={`/preguntas/${preguntaActual.imagen_pregunta}`} alt="Imagen pregunta"
-                  style={{ maxWidth: '100%', borderRadius: '8px', margin: '1rem 0', pointerEvents: 'none' }} />
+                  style={{ maxWidth: '100%', borderRadius: '8px', margin: '0.25rem 0 1rem', pointerEvents: 'none' }} />
               )}
               {preguntaActual.acotacion && (
                 <p style={{ fontWeight: '600', color: '#166534', marginTop: '1rem', fontSize: '1rem' }}>
@@ -332,7 +332,7 @@ function Questions() {
                   {preguntaActual.comentario_general}
                 </p>
                 {preguntaActual.imagen_solucion && (
-                  <img src={`/preguntas/${preguntaActual.imagen_solucion}`} alt="Imagen solución"
+                  <img src={`/soluciones/${preguntaActual.imagen_solucion}`} alt="Imagen solución"
                     style={{ maxWidth: '100%', borderRadius: '8px', margin: '1rem 0', pointerEvents: 'none' }} />
                 )}
                 {preguntaActual.explicacion_opciones && (
