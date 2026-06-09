@@ -305,7 +305,7 @@ function Questions() {
             </div>
 
             <div style={cardStyle}>
-              <p style={{ fontSize: '1rem', lineHeight: '1.8', color: '#14532d', whiteSpace: 'pre-line', marginBottom: '0' }}>
+              <p style={{ fontSize: '1.05rem', lineHeight: '1.8', color: '#14532d', whiteSpace: 'pre-line', marginBottom: '0' }}>
                 {preguntaActual.enunciado?.trimEnd()}
               </p>
               {preguntaActual.imagen_pregunta && (
@@ -313,7 +313,10 @@ function Questions() {
                   style={{ maxWidth: '100%', borderRadius: '8px', margin: '0', pointerEvents: 'none' }} />
               )}
               {preguntaActual.acotacion && (
-                <p style={{ fontWeight: '600', color: '#166534', marginTop: '1rem', fontSize: '1rem' }}>
+                <p style={{
+                  fontWeight: '600', color: '#166534', marginTop: '1rem',
+                  paddingTop: '1rem', borderTop: '1.5px solid #bbf7d0', fontSize: '1rem'
+                }}>
                   {preguntaActual.acotacion}
                 </p>
               )}
