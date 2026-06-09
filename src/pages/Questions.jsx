@@ -64,13 +64,25 @@ function Questions() {
     { letra: 'F', texto: preguntaActual.opcion_f },
   ].filter(o => o.texto) : []
 
-  const handleSeleccion = (letra) => {
+  const handleSeleccion = async (letra) => {
     if (respondida) return
     setSeleccion(letra)
     setRespondida(true)
     const correcta = letra === preguntaActual.respuesta_correcta
     setRespuestas([...respuestas, { id: preguntaActual.id, correcta }])
     setHistorial([...historial, { seleccion: letra, respondida: true }])
+
+    const { data: { session } } = await supabase.auth.getSession()
+    if (session) {
+      await supabase.from('sesiones_usuario').insert({
+        user_id: session.user.id,
+        topico: preguntaActual.topico,
+        area: preguntaActual.area,
+        pregunta_id: preguntaActual.id,
+        correcta,
+        modo_examen: modoExamen
+      })
+    }
   }
 
   const handleSiguiente = () => {

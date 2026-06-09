@@ -9,6 +9,7 @@ import Stats from './pages/Stats'
 import ProtectedRoute from './components/ProtectedRoute'
 import AutorizadoRoute from './components/AutorizadoRoute'
 import Terminos from './pages/Terminos'
+import Dashboard from './pages/Dashboard'
 
 function App() {
   return (
@@ -38,6 +39,11 @@ function App() {
           </AutorizadoRoute>
         } />
         <Route path="/terminos" element={<Terminos />
+        } />
+        <Route path="/dashboard" element={
+          <AutorizadoRoute>
+            <Dashboard />
+          </AutorizadoRoute>
         } />
       </Routes>
     </BrowserRouter>
