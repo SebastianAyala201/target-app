@@ -5,41 +5,41 @@ const topicos = {
     nombre: 'Fisiología',
     topicos: [
       { id: 'fisiologia_celular', nombre: 'Fisiología Celular', imagen: '/topicos/fisiologia_celular.jpg', disponible: true },
-      { id: 'fisiologia_nerviosa', nombre: 'Fisiología Nerviosa', imagen: '/topicos/neurologia.jpg', disponible: false },
-      { id: 'fisiologia_renal', nombre: 'Fisiología Renal', imagen: '/topicos/nefrologia.jpg', disponible: true },
+      { id: 'fisiologia_nerviosa', nombre: 'Fisiología Nerviosa', imagen: '/topicos/fisiologia_nerviosa.jpg', disponible: false },
+      { id: 'fisiologia_renal', nombre: 'Fisiología Renal', imagen: '/topicos/fisiologia_renal.jpg', disponible: false },
     ]
   },
   fisiopatologia: {
     nombre: 'Fisiopatología',
     topicos: [
-      { id: 'reumatologia', nombre: 'Reumatología', imagen: '/topicos/reumatologia.jpg', disponible: true },
-      { id: 'nefrologia', nombre: 'Renal', imagen: '/topicos/nefrologia.jpg', disponible: true },
-      { id: 'gastroenterologia', nombre: 'Gastrointestinal', imagen: '/topicos/gastroenterologia.jpg', disponible: true },
+      { id: 'reumatologia', nombre: 'Reumatología', imagen: '/topicos/reumatologia.jpg', disponible: false },
+      { id: 'nefrologia', nombre: 'Nefrología', imagen: '/topicos/nefrologia.jpg', disponible: false },
+      { id: 'gastroenterologia', nombre: 'Gastroenterología', imagen: '/topicos/gastroenterologia.jpg', disponible: false },
     ]
   },
   anatomia: {
     nombre: 'Anatomía',
     topicos: [
-      { id: 'anatomia_cardiovascular', nombre: 'Anatomía Cardiovascular', imagen: '/topicos/anatomia.jpg', disponible: false },
+      { id: 'anatomia_cardiovascular', nombre: 'Anatomía Cardiovascular', imagen: '/topicos/anatomia_cardiovascular.jpg', disponible: true },
     ]
   },
   histologia: {
     nombre: 'Histología',
     topicos: [
-      { id: 'histologia_cardiovascular', nombre: 'Histología Cardiovascular', imagen: '/topicos/histologia.jpg', disponible: false },
+      { id: 'histologia_cardiovascular', nombre: 'Histología Cardiovascular', imagen: '/topicos/histologia_cardiovascular.jpg', disponible: true },
     ]
   },
   embriologia: {
     nombre: 'Embriología',
     topicos: [
-      { id: 'embriologia_cardiovascular', nombre: 'Embriología Cardiovascular', imagen: '/topicos/embriologia.jpg', disponible: false },
-      { id: 'embriologia_renal', nombre: 'Embriología Renal', imagen: '/topicos/embriologia.jpg', disponible: false },
+      { id: 'embriologia_cardiovascular', nombre: 'Embriología Cardiovascular', imagen: '/topicos/embriologia_cardiovascular.jpg', disponible: true },
+      { id: 'embriologia_renal', nombre: 'Embriología Renal', imagen: '/topicos/embriologia_renal.jpg', disponible: false },
     ]
   },
   medicina_interna: {
     nombre: 'Medicina Interna',
     topicos: [
-      { id: 'hematologia', nombre: 'Hematología', imagen: '/topicos/medicina_interna.jpg', disponible: false },
+      { id: 'hematologia', nombre: 'Hematología', imagen: '/topicos/hematologia.jpg', disponible: false },
       { id: 'neurologia', nombre: 'Neurología', imagen: '/topicos/neurologia.jpg', disponible: false },
     ]
   },

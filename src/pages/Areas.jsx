@@ -4,9 +4,9 @@ import { supabase } from '../lib/supabase'
 const areas = [
   { id: 'fisiologia', nombre: 'Fisiología', imagen: '/topicos/fisiologia.jpg', disponible: true },
   { id: 'fisiopatologia', nombre: 'Fisiopatología', imagen: '/topicos/fisiopatologia.jpg', disponible: true },
-  { id: 'anatomia', nombre: 'Anatomía', imagen: '/topicos/anatomia.jpg', disponible: false },
-  { id: 'histologia', nombre: 'Histología', imagen: '/topicos/histologia.jpg', disponible: false },
-  { id: 'embriologia', nombre: 'Embriología', imagen: '/topicos/embriologia.jpg', disponible: false },
+  { id: 'anatomia', nombre: 'Anatomía', imagen: '/topicos/anatomia.jpg', disponible: true },
+  { id: 'histologia', nombre: 'Histología', imagen: '/topicos/histologia.jpg', disponible: true },
+  { id: 'embriologia', nombre: 'Embriología', imagen: '/topicos/embriologia.jpg', disponible: true },
   { id: 'medicina_interna', nombre: 'Medicina Interna', imagen: '/topicos/medicina_interna.jpg', disponible: false },
 ]
 
