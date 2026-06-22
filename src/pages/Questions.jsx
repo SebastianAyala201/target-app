@@ -305,9 +305,9 @@ function Questions() {
             </div>
 
             <div style={cardStyle}>
-              <p style={{ fontSize: '1.05rem', lineHeight: '1.8', color: '#14532d', whiteSpace: 'pre-line', marginBottom: '0' }}>
-                {preguntaActual.enunciado?.trimEnd()}
-              </p>
+              <div className="md-content" style={{ fontSize: '1.05rem', lineHeight: '1.8', color: '#14532d', marginBottom: '0' }}>
+                <ReactMarkdown {...mdProps}>{preguntaActual.enunciado?.trimEnd()}</ReactMarkdown>
+              </div>
               {preguntaActual.imagen_pregunta && (
                 <img src={`/preguntas/${preguntaActual.imagen_pregunta}`} alt="Imagen pregunta"
                   style={{ maxWidth: '100%', borderRadius: '8px', margin: '0', pointerEvents: 'none' }} />
