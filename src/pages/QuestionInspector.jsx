@@ -11,12 +11,12 @@ const supabase = createClient(
 )
 
 const areaColors = {
-  histologia:       { bg: '#dbeafe', color: '#1e40af', border: '#93c5fd' },
-  embriologia:      { bg: '#dcfce7', color: '#166534', border: '#86efac' },
-  anatomia:         { bg: '#ffedd5', color: '#9a3412', border: '#fdba74' },
-  fisiologia:       { bg: '#f3e8ff', color: '#6b21a8', border: '#d8b4fe' },
-  fisiopatologia:   { bg: '#fee2e2', color: '#991b1b', border: '#fca5a5' },
-  farmacologia:     { bg: '#fef9c3', color: '#854d0e', border: '#fde047' },
+  histologia: { bg: '#dbeafe', color: '#1e40af', border: '#93c5fd' },
+  embriologia: { bg: '#dcfce7', color: '#166534', border: '#86efac' },
+  anatomia: { bg: '#ffedd5', color: '#9a3412', border: '#fdba74' },
+  fisiologia: { bg: '#f3e8ff', color: '#6b21a8', border: '#d8b4fe' },
+  fisiopatologia: { bg: '#fee2e2', color: '#991b1b', border: '#fca5a5' },
+  farmacologia: { bg: '#fef9c3', color: '#854d0e', border: '#fde047' },
   medicina_interna: { bg: '#f1f5f9', color: '#334155', border: '#cbd5e1' },
 }
 
@@ -190,9 +190,9 @@ export default function QuestionInspector() {
             <div style={{ backgroundColor: 'white', borderRadius: '16px', padding: '2rem', boxShadow: '0 1px 8px rgba(0,0,0,0.06)', marginBottom: '1rem' }}>
 
               {/* ENUNCIADO */}
-              <p style={{ fontSize: '1rem', lineHeight: '1.8', color: '#0f172a', whiteSpace: 'pre-line', marginBottom: '0' }}>
-                {pregunta.enunciado?.trimEnd()}
-              </p>
+              <div className="md-content" style={{ fontSize: '1rem', lineHeight: '1.8', color: '#0f172a', marginBottom: '0' }}>
+                <ReactMarkdown {...mdProps}>{pregunta.enunciado?.trimEnd()}</ReactMarkdown>
+              </div>
 
               {/* IMAGEN PREGUNTA */}
               {pregunta.imagen_pregunta && (
