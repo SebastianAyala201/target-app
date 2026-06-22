@@ -6,11 +6,6 @@ import rehypeKatex from 'rehype-katex'
 import 'katex/dist/katex.min.css'
 import remarkGfm from 'remark-gfm'
 
-const mdProps = {
-  remarkPlugins: [remarkMath, remarkGfm],
-  rehypePlugins: [rehypeKatex],
-}
-
 const supabase = createClient(
   'https://wwaqrfpuiplblucqaudx.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3YXFyZnB1aXBsYmx1Y3FhdWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMDEwNDIsImV4cCI6MjA5MDc3NzA0Mn0.G-1K6YEPwrPu8MiiGuRH6V-6yTuIU-fmuVrMa10yMdo'
@@ -27,7 +22,7 @@ const areaColors = {
 }
 
 const mdProps = {
-  remarkPlugins: [remarkMath],
+  remarkPlugins: [remarkMath, remarkGfm],
   rehypePlugins: [rehypeKatex],
 }
 

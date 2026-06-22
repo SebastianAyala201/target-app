@@ -12,11 +12,6 @@ const mdProps = {
   rehypePlugins: [rehypeKatex],
 }
 
-const mdProps = {
-  remarkPlugins: [remarkMath],
-  rehypePlugins: [rehypeKatex],
-}
-
 const mdStyle = {
   color: '#166534', lineHeight: '1.8', fontSize: '0.95rem'
 }
