@@ -4,6 +4,12 @@ import ReactMarkdown from 'react-markdown'
 import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import 'katex/dist/katex.min.css'
+import remarkGfm from 'remark-gfm'
+
+const mdProps = {
+  remarkPlugins: [remarkMath, remarkGfm],
+  rehypePlugins: [rehypeKatex],
+}
 
 const supabase = createClient(
   'https://wwaqrfpuiplblucqaudx.supabase.co',
