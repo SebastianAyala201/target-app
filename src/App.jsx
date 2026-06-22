@@ -9,6 +9,7 @@ import Stats from './pages/Stats'
 import AutorizadoRoute from './components/AutorizadoRoute'
 import Terminos from './pages/Terminos'
 import Dashboard from './pages/Dashboard'
+import QuestionInspector from './pages/QuestionInspector'
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
           </AutorizadoRoute>
         } />
         <Route path="/terminos" element={<Terminos />} />
+        <Route path="/inspector" element={<QuestionInspector />} />
         <Route path="/dashboard" element={
           <AutorizadoRoute>
             <Dashboard />
