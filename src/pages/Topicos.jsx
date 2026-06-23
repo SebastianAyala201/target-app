@@ -5,8 +5,8 @@ const topicos = {
     nombre: 'Fisiología',
     topicos: [
       { id: 'fisiologia_celular', nombre: 'Fisiología Celular', imagen: '/topicos/fisiologia_celular.jpg', disponible: true },
-      { id: 'fisiologia_nerviosa', nombre: 'Fisiología Nerviosa', imagen: '/topicos/fisiologia_nerviosa.jpg', disponible: false },
-      { id: 'fisiologia_renal', nombre: 'Fisiología Renal', imagen: '/topicos/fisiologia_renal.jpg', disponible: false },
+      { id: 'fisiologia_nerviosa', nombre: 'Fisiología Nerviosa', imagen: '/topicos/fisiologia_nerviosa.jpg', disponible: true },
+      { id: 'fisiologia_renal', nombre: 'Fisiología Renal', imagen: '/topicos/fisiologia_renal.jpg', disponible: true },
     ]
   },
   fisiopatologia: {
@@ -33,14 +33,14 @@ const topicos = {
     nombre: 'Embriología',
     topicos: [
       { id: 'embriologia_cardiovascular', nombre: 'Embriología Cardiovascular', imagen: '/topicos/embriologia_cardiovascular.jpg', disponible: true },
-      { id: 'embriologia_renal', nombre: 'Embriología Renal', imagen: '/topicos/embriologia_renal.jpg', disponible: false },
+      { id: 'embriologia_renal', nombre: 'Embriología Renal', imagen: '/topicos/embriologia_renal.jpg', disponible: true },
     ]
   },
   medicina_interna: {
     nombre: 'Medicina Interna',
     topicos: [
-      { id: 'hematologia', nombre: 'Hematología', imagen: '/topicos/hematologia.jpg', disponible: false },
-      { id: 'neurologia', nombre: 'Neurología', imagen: '/topicos/neurologia.jpg', disponible: false },
+      { id: 'hematologia', nombre: 'Hematología', imagen: '/topicos/hematologia.jpg', disponible: true },
+      { id: 'neurologia', nombre: 'Neurología', imagen: '/topicos/neurologia.jpg', disponible: true },
     ]
   },
 }
