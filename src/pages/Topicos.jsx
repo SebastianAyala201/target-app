@@ -18,7 +18,7 @@ const topicos = {
     descripcion: 'Mecanismos fundamentales del funcionamiento del cuerpo humano.',
     topicos: [
       { id: 'fisiologia_celular',  nombre: 'Fisiología Celular',  imagen: '/topicos/fisiologia_celular.jpg',  preguntas: '19', disponible: true  },
-      { id: 'fisiologia_nerviosa', nombre: 'Fisiología Nerviosa', imagen: '/topicos/fisiologia_nerviosa.jpg', preguntas: 'Pronto', disponible: false },
+      { id: 'fisiologia_nerviosa', nombre: 'Fisiología Nerviosa', imagen: '/topicos/fisiologia_nerviosa.jpg', preguntas: 'Pronto', disponible: true },
       { id: 'fisiologia_renal',    nombre: 'Fisiología Renal',    imagen: '/topicos/fisiologia_renal.jpg',    preguntas: '4',  disponible: true  },
     ]
   },
@@ -26,9 +26,9 @@ const topicos = {
     nombre: 'Fisiopatología',
     descripcion: 'Alteraciones de los mecanismos fisiológicos en la enfermedad.',
     topicos: [
-      { id: 'reumatologia',     nombre: 'Reumatología',     imagen: '/topicos/reumatologia.jpg',     preguntas: 'Pronto', disponible: false },
-      { id: 'nefrologia',       nombre: 'Nefrología',       imagen: '/topicos/nefrologia.jpg',       preguntas: 'Pronto', disponible: false },
-      { id: 'gastroenterologia',nombre: 'Gastroenterología',imagen: '/topicos/gastroenterologia.jpg',preguntas: 'Pronto', disponible: false },
+      { id: 'reumatologia',     nombre: 'Reumatología',     imagen: '/topicos/reumatologia.jpg',     preguntas: 'Pronto', disponible: true },
+      { id: 'nefrologia',       nombre: 'Nefrología',       imagen: '/topicos/nefrologia.jpg',       preguntas: 'Pronto', disponible: true },
+      { id: 'gastroenterologia',nombre: 'Gastroenterología',imagen: '/topicos/gastroenterologia.jpg',preguntas: 'Pronto', disponible: true },
     ]
   },
   anatomia: {
@@ -57,7 +57,7 @@ const topicos = {
     nombre: 'Medicina Interna',
     descripcion: 'Diagnóstico y tratamiento de enfermedades del adulto.',
     topicos: [
-      { id: 'hematologia', nombre: 'Hematología', imagen: '/topicos/hematologia.jpg', preguntas: 'Pronto', disponible: false },
+      { id: 'hematologia', nombre: 'Hematología', imagen: '/topicos/hematologia.jpg', preguntas: 'Pronto', disponible: true },
       { id: 'neurologia',  nombre: 'Neurología',  imagen: '/topicos/neurologia.jpg',  preguntas: 'Pronto', disponible: false },
     ]
   },
