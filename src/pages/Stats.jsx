@@ -1,110 +1,175 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 
-function Stats() {
+const T = {
+  forest:    '#0f3d2e',
+  pine:      '#1a5c3a',
+  emerald:   '#16a34a',
+  mist:      '#f0faf4',
+  surface:   '#ffffff',
+  text:      '#0f1a14',
+  textMuted: '#4a6355',
+  border:    '#c8e6d4',
+  lime:      '#a3e635',
+}
+
+export default function Stats() {
   const { state } = useLocation()
   const navigate = useNavigate()
 
   const respuestas = state?.respuestas || []
   const total = state?.total || 0
+  const modoExamen = state?.modoExamen || false
   const correctas = respuestas.filter(r => r.correcta).length
   const incorrectas = respuestas.filter(r => !r.correcta).length
   const respondidas = respuestas.length
   const porcentaje = respondidas > 0 ? Math.round((correctas / respondidas) * 100) : 0
 
-  const getMensaje = () => {
-    if (porcentaje >= 80) return { texto: '¡Excelente desempeño!', color: '#16a34a' }
-    if (porcentaje >= 60) return { texto: '¡Buen trabajo, sigue practicando!', color: '#ca8a04' }
-    return { texto: 'Necesitas repasar más, ¡tú puedes!', color: '#dc2626' }
-  }
+  const nivel = porcentaje >= 80 ? { texto: 'Excelente', color: T.emerald, bg: '#dcfce7', border: '#bbf7d0' }
+              : porcentaje >= 60 ? { texto: 'Buen trabajo', color: '#ca8a04', bg: '#fefce8', border: '#fde047' }
+              : { texto: 'Sigue practicando', color: '#dc2626', bg: '#fef2f2', border: '#fca5a5' }
 
-  const mensaje = getMensaje()
+  const circleSize = 140
+  const radius = 52
+  const circumference = 2 * Math.PI * radius
+  const offset = circumference - (porcentaje / 100) * circumference
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f0faf4', fontFamily: 'Segoe UI, sans-serif' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: T.mist, fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif" }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        * { box-sizing: border-box; }
+        .btn-primary {
+          background-color: #16a34a; color: white; border: none;
+          padding: 12px 28px; border-radius: 8px; font-size: 0.9rem;
+          font-weight: 700; cursor: pointer; font-family: inherit;
+          transition: background 0.15s;
+        }
+        .btn-primary:hover { background-color: #1a5c3a; }
+        .btn-sec {
+          background: transparent; color: #4a6355;
+          border: 1.5px solid #c8e6d4; padding: 12px 24px;
+          border-radius: 8px; font-size: 0.9rem; cursor: pointer;
+          font-family: inherit; transition: border-color 0.15s, color 0.15s;
+        }
+        .btn-sec:hover { border-color: #16a34a; color: #0f3d2e; }
+        .nav-btn {
+          background: transparent; border: 1.5px solid rgba(255,255,255,0.3);
+          color: rgba(255,255,255,0.85); padding: 7px 18px; border-radius: 7px;
+          font-size: 0.85rem; font-weight: 500; cursor: pointer;
+          transition: border-color 0.15s; font-family: inherit;
+        }
+        .nav-btn:hover { border-color: rgba(255,255,255,0.7); color: white; }
+      `}</style>
 
       {/* NAVBAR */}
-      <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 2.5rem', backgroundColor: '#166534', boxShadow: '0 2px 10px rgba(0,0,0,0.2)' }}>
-        <h1 style={{ color: 'white', fontSize: '1.5rem', fontWeight: '800', margin: 0 }}>TARGET</h1>
+      <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 2.5rem', height: '58px', backgroundColor: T.forest, borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <img src="/logo.png" alt="High Yields" style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} />
+          <span style={{ color: 'white', fontWeight: '800', fontSize: '0.95rem', letterSpacing: '0.06em' }}>HIGH YIELDS</span>
+        </div>
+        <button className="nav-btn" onClick={() => navigate('/areas')}>Practicar de nuevo</button>
       </nav>
 
-      <div style={{ maxWidth: '700px', margin: '0 auto', padding: '3rem 2rem' }}>
+      <div style={{ maxWidth: '680px', margin: '0 auto', padding: '3rem 1.5rem' }}>
 
-        <h2 style={{ color: '#14532d', fontSize: '2rem', fontWeight: '800', marginBottom: '0.5rem' }}>Resumen de estudio</h2>
-        <p style={{ color: mensaje.color, fontSize: '1.1rem', fontWeight: '600', marginBottom: '2rem' }}>{mensaje.texto}</p>
-
-        {/* TARJETAS STATS */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-          <div style={statCardStyle}>
-            <p style={statNumStyle}>{respondidas}</p>
-            <p style={statLabelStyle}>Respondidas</p>
-          </div>
-          <div style={statCardStyle}>
-            <p style={{ ...statNumStyle, color: '#16a34a' }}>{correctas}</p>
-            <p style={statLabelStyle}>Correctas</p>
-          </div>
-          <div style={statCardStyle}>
-            <p style={{ ...statNumStyle, color: '#dc2626' }}>{incorrectas}</p>
-            <p style={statLabelStyle}>Incorrectas</p>
-          </div>
-          <div style={statCardStyle}>
-            <p style={{ ...statNumStyle, color: '#2563eb' }}>{porcentaje}%</p>
-            <p style={statLabelStyle}>Aciertos</p>
+        {/* Header */}
+        <div style={{ marginBottom: '2rem' }}>
+          <p style={{ fontSize: '0.72rem', fontWeight: '700', color: T.textMuted, letterSpacing: '0.1em', textTransform: 'uppercase', margin: '0 0 6px' }}>
+            {modoExamen ? 'Modo examen' : 'Modo estudio'}
+          </p>
+          <h1 style={{ fontSize: '2rem', fontWeight: '900', color: T.forest, margin: '0 0 6px', letterSpacing: '-0.02em' }}>
+            Sesión completada
+          </h1>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', backgroundColor: nivel.bg, border: `1px solid ${nivel.border}`, borderRadius: '999px', padding: '4px 12px' }}>
+            <span style={{ fontSize: '0.78rem', fontWeight: '700', color: nivel.color }}>{nivel.texto}</span>
           </div>
         </div>
 
-        {/* BARRA DE PROGRESO */}
-        <div style={{ backgroundColor: 'white', borderRadius: '16px', padding: '2rem', boxShadow: '0 4px 20px rgba(22,101,52,0.1)', marginBottom: '2rem' }}>
-          <p style={{ color: '#14532d', fontWeight: '600', marginBottom: '1rem' }}>Porcentaje de aciertos</p>
-          <div style={{ backgroundColor: '#dcfce7', borderRadius: '999px', height: '20px', overflow: 'hidden' }}>
-            <div style={{
-              height: '100%',
-              width: `${porcentaje}%`,
-              backgroundColor: porcentaje >= 80 ? '#16a34a' : porcentaje >= 60 ? '#ca8a04' : '#dc2626',
-              borderRadius: '999px',
-              transition: 'width 1s ease'
-            }} />
+        {/* Card principal — círculo + stats */}
+        <div style={{ backgroundColor: T.surface, borderRadius: '16px', padding: '2rem', border: `1px solid ${T.border}`, boxShadow: '0 4px 24px rgba(15,61,46,0.08)', marginBottom: '1.25rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem', flexWrap: 'wrap' }}>
+
+            {/* Círculo de progreso SVG */}
+            <div style={{ position: 'relative', width: circleSize, height: circleSize, flexShrink: 0 }}>
+              <svg width={circleSize} height={circleSize} style={{ transform: 'rotate(-90deg)' }}>
+                <circle cx={circleSize/2} cy={circleSize/2} r={radius} fill="none" stroke="#e8f5e9" strokeWidth="10"/>
+                <circle
+                  cx={circleSize/2} cy={circleSize/2} r={radius}
+                  fill="none" stroke={nivel.color} strokeWidth="10"
+                  strokeDasharray={circumference} strokeDashoffset={offset}
+                  strokeLinecap="round"
+                  style={{ transition: 'stroke-dashoffset 1s ease' }}
+                />
+              </svg>
+              <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ fontSize: '1.8rem', fontWeight: '900', color: T.forest, lineHeight: 1, letterSpacing: '-0.03em' }}>{porcentaje}%</span>
+                <span style={{ fontSize: '0.7rem', fontWeight: '600', color: T.textMuted }}>aciertos</span>
+              </div>
+            </div>
+
+            {/* Stats verticales */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px', minWidth: '180px' }}>
+              {[
+                { label: 'Respondidas', valor: respondidas, color: T.forest },
+                { label: 'Correctas',   valor: correctas,   color: T.emerald },
+                { label: 'Incorrectas', valor: incorrectas,  color: '#dc2626' },
+                { label: 'Sin responder', valor: total - respondidas, color: T.textMuted },
+              ].map(s => (
+                <div key={s.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '10px', borderBottom: `1px solid ${T.border}` }}>
+                  <span style={{ fontSize: '0.875rem', color: T.textMuted, fontWeight: '500' }}>{s.label}</span>
+                  <span style={{ fontSize: '1rem', fontWeight: '800', color: s.color }}>{s.valor}</span>
+                </div>
+              ))}
+            </div>
           </div>
-          <p style={{ color: '#166534', fontSize: '0.9rem', marginTop: '0.5rem' }}>{correctas} de {respondidas} preguntas correctas</p>
         </div>
 
-        {/* PREGUNTAS NO RESPONDIDAS */}
+        {/* Aviso preguntas sin responder */}
         {respondidas < total && (
-          <div style={{ backgroundColor: '#fef9c3', border: '1px solid #fde047', borderRadius: '12px', padding: '1rem 1.5rem', marginBottom: '2rem' }}>
-            <p style={{ color: '#854d0e', fontSize: '0.95rem', margin: 0 }}>
-              ⚠️ Finalizaste antes de responder todas las preguntas. Respondiste {respondidas} de {total}.
+          <div style={{ backgroundColor: '#fefce8', border: '1px solid #fde047', borderRadius: '10px', padding: '12px 16px', marginBottom: '1.25rem', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0, marginTop: '1px' }}>
+              <circle cx="8" cy="8" r="8" fill="#fbbf24"/>
+              <path d="M8 5v4M8 11v.5" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+            <p style={{ color: '#854d0e', fontSize: '0.85rem', margin: 0, lineHeight: 1.5 }}>
+              Finalizaste antes de completar la sesión. Respondiste {respondidas} de {total} preguntas.
             </p>
           </div>
         )}
 
-        {/* BOTONES */}
-        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          <button onClick={() => navigate('/areas')} style={btnPrimaryStyle}>
-            Volver a tópicos
-          </button>
+        {/* Barra visual correctas/incorrectas */}
+        <div style={{ backgroundColor: T.surface, borderRadius: '14px', padding: '1.5rem', border: `1px solid ${T.border}`, boxShadow: '0 2px 12px rgba(15,61,46,0.06)', marginBottom: '2rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+            <span style={{ fontSize: '0.82rem', fontWeight: '600', color: T.textMuted }}>Distribución de respuestas</span>
+            <span style={{ fontSize: '0.82rem', fontWeight: '700', color: nivel.color }}>{correctas} / {respondidas}</span>
+          </div>
+          <div style={{ display: 'flex', height: '10px', borderRadius: '999px', overflow: 'hidden', backgroundColor: '#f1f5f9' }}>
+            {respondidas > 0 && (
+              <>
+                <div style={{ width: `${(correctas/respondidas)*100}%`, backgroundColor: T.emerald, transition: 'width 1s ease' }} />
+                <div style={{ width: `${(incorrectas/respondidas)*100}%`, backgroundColor: '#fca5a5', transition: 'width 1s ease' }} />
+              </>
+            )}
+          </div>
+          <div style={{ display: 'flex', gap: '1.5rem', marginTop: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: T.emerald }} />
+              <span style={{ fontSize: '0.75rem', color: T.textMuted }}>Correctas ({correctas})</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#fca5a5' }} />
+              <span style={{ fontSize: '0.75rem', color: T.textMuted }}>Incorrectas ({incorrectas})</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Botones */}
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <button className="btn-primary" onClick={() => navigate('/areas')}>Practicar de nuevo</button>
+          <button className="btn-sec" onClick={() => navigate('/dashboard')}>Ver mi progreso</button>
         </div>
 
       </div>
     </div>
   )
 }
-
-const statCardStyle = {
-  backgroundColor: 'white', borderRadius: '12px', padding: '1.5rem',
-  boxShadow: '0 4px 20px rgba(22,101,52,0.1)', textAlign: 'center'
-}
-
-const statNumStyle = {
-  fontSize: '2rem', fontWeight: '800', color: '#14532d', margin: '0 0 4px'
-}
-
-const statLabelStyle = {
-  fontSize: '0.85rem', color: '#166534', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em'
-}
-
-const btnPrimaryStyle = {
-  backgroundColor: '#16a34a', color: 'white', border: 'none',
-  padding: '12px 28px', borderRadius: '8px', fontSize: '1rem',
-  fontWeight: '600', cursor: 'pointer'
-}
-
-export default Stats

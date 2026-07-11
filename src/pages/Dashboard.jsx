@@ -2,7 +2,27 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
-function Dashboard() {
+const T = {
+  forest:    '#0f3d2e',
+  pine:      '#1a5c3a',
+  emerald:   '#16a34a',
+  mist:      '#f0faf4',
+  surface:   '#ffffff',
+  text:      '#0f1a14',
+  textMuted: '#4a6355',
+  border:    '#c8e6d4',
+  lime:      '#a3e635',
+}
+
+const getNivel = (pct) =>
+  pct >= 80 ? { color: T.emerald, bg: '#dcfce7' }
+: pct >= 60 ? { color: '#ca8a04', bg: '#fefce8' }
+: { color: '#dc2626', bg: '#fef2f2' }
+
+const formatTopico = (t) => t?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+const formatFecha = (f) => new Date(f + 'T12:00:00').toLocaleDateString('es-PE', { day: '2-digit', month: 'short' })
+
+export default function Dashboard() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState(null)
@@ -10,9 +30,7 @@ function Dashboard() {
   const [recientes, setRecientes] = useState([])
   const [semana, setSemana] = useState([])
 
-  useEffect(() => {
-    cargarDatos()
-  }, [])
+  useEffect(() => { cargarDatos() }, [])
 
   const cargarDatos = async () => {
     setLoading(true)
@@ -20,32 +38,26 @@ function Dashboard() {
     if (!session) { navigate('/signin'); return }
 
     const { data } = await supabase
-      .from('sesiones_usuario')
-      .select('*')
+      .from('sesiones_usuario').select('*')
       .eq('user_id', session.user.id)
       .order('created_at', { ascending: false })
 
     if (data) {
       const total = data.length
       const correctas = data.filter(r => r.correcta).length
-      const incorrectas = total - correctas
-      const porcentaje = total > 0 ? Math.round((correctas / total) * 100) : 0
-      setStats({ total, correctas, incorrectas, porcentaje })
+      setStats({ total, correctas, incorrectas: total - correctas, porcentaje: total > 0 ? Math.round((correctas / total) * 100) : 0 })
 
-      // Por tópico
-      const topicos = {}
+      const topicosMap = {}
       data.forEach(r => {
-        if (!topicos[r.topico]) topicos[r.topico] = { total: 0, correctas: 0 }
-        topicos[r.topico].total++
-        if (r.correcta) topicos[r.topico].correctas++
+        if (!topicosMap[r.topico]) topicosMap[r.topico] = { total: 0, correctas: 0 }
+        topicosMap[r.topico].total++
+        if (r.correcta) topicosMap[r.topico].correctas++
       })
-      const topicosArr = Object.entries(topicos).map(([topico, d]) => ({
+      setPorTopico(Object.entries(topicosMap).map(([topico, d]) => ({
         topico, total: d.total, correctas: d.correctas,
         porcentaje: Math.round((d.correctas / d.total) * 100)
-      })).sort((a, b) => b.total - a.total)
-      setPorTopico(topicosArr)
+      })).sort((a, b) => b.total - a.total))
 
-      // Últimas 5 sesiones por día
       const porDia = {}
       data.forEach(r => {
         const dia = r.created_at.split('T')[0]
@@ -53,35 +65,30 @@ function Dashboard() {
         porDia[dia].total++
         if (r.correcta) porDia[dia].correctas++
       })
-      const diasArr = Object.entries(porDia)
+      setRecientes(Object.entries(porDia)
         .map(([dia, d]) => ({ dia, ...d, porcentaje: Math.round((d.correctas / d.total) * 100) }))
-        .slice(0, 5)
-      setRecientes(diasArr)
+        .slice(0, 5))
 
-      // SEMANA ACTUAL
       const hoy = new Date()
-      const diaSemana = hoy.getDay() // 0=dom, 1=lun...
       const lunes = new Date(hoy)
-      lunes.setDate(hoy.getDate() - ((diaSemana + 6) % 7))
-
-      const diasSemana = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
-      const semanaData = diasSemana.map((nombre, i) => {
+      lunes.setDate(hoy.getDate() - ((hoy.getDay() + 6) % 7))
+      const hoySt = hoy.toISOString().split('T')[0]
+      setSemana(['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].map((nombre, i) => {
         const fecha = new Date(lunes)
         fecha.setDate(lunes.getDate() + i)
         const fechaStr = fecha.toISOString().split('T')[0]
-        const hoySt = hoy.toISOString().split('T')[0]
-        const esFuturo = fechaStr > hoySt
-        const esHoy = fechaStr === hoySt
-
         const registros = data.filter(r => r.created_at.split('T')[0] === fechaStr)
         const preguntas = registros.length
         const correctasDia = registros.filter(r => r.correcta).length
-        const minutos = Math.round(preguntas * 2)
-        const pct = preguntas > 0 ? Math.round((correctasDia / preguntas) * 100) : 0
-
-        return { nombre, fecha: fechaStr, esHoy, esFuturo, preguntas, minutos, pct, activo: preguntas > 0 }
-      })
-      setSemana(semanaData)
+        return {
+          nombre, fechaStr,
+          esHoy: fechaStr === hoySt,
+          esFuturo: fechaStr > hoySt,
+          preguntas,
+          pct: preguntas > 0 ? Math.round((correctasDia / preguntas) * 100) : 0,
+          activo: preguntas > 0,
+        }
+      }))
     }
     setLoading(false)
   }
@@ -91,146 +98,187 @@ function Dashboard() {
     navigate('/')
   }
 
-  const getMensaje = (pct) => {
-    if (pct >= 80) return { texto: '¡Excelente!', color: '#16a34a' }
-    if (pct >= 60) return { texto: 'Buen trabajo', color: '#ca8a04' }
-    return { texto: 'Sigue practicando', color: '#dc2626' }
-  }
-
-  const formatTopico = (t) => t?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
-  const formatFecha = (f) => new Date(f).toLocaleDateString('es-PE', { day: '2-digit', month: 'short' })
-
   if (loading) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f0faf4', fontFamily: 'Segoe UI, sans-serif' }}>
-      <p style={{ color: '#166534', fontSize: '1.2rem' }}>Cargando tu progreso...</p>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: T.mist, fontFamily: 'Inter, system-ui, sans-serif' }}>
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ width: '32px', height: '32px', border: `3px solid ${T.border}`, borderTopColor: T.emerald, borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 12px' }} />
+        <p style={{ color: T.textMuted, fontSize: '0.9rem', margin: 0 }}>Cargando tu progreso...</p>
+      </div>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   )
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f0faf4', fontFamily: 'Segoe UI, sans-serif' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: T.mist, fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif" }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        * { box-sizing: border-box; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .nav-btn {
+          background: transparent; border: 1.5px solid rgba(255,255,255,0.3);
+          color: rgba(255,255,255,0.85); padding: 7px 18px; border-radius: 7px;
+          font-size: 0.85rem; font-weight: 500; cursor: pointer;
+          transition: border-color 0.15s; font-family: inherit;
+        }
+        .nav-btn:hover { border-color: rgba(255,255,255,0.7); color: white; }
+        .card {
+          background: white; border-radius: 14px; border: 1px solid #c8e6d4;
+          box-shadow: 0 2px 16px rgba(15,61,46,0.06);
+        }
+      `}</style>
 
-      <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 2.5rem', backgroundColor: '#166534', boxShadow: '0 2px 10px rgba(0,0,0,0.2)' }}>
-        <h1 style={{ color: 'white', fontSize: '1.5rem', fontWeight: '800', margin: 0 }}>HIGH YIELDS</h1>
-        <div style={{ display: 'flex', gap: '1rem' }}>
-          <button onClick={() => navigate('/areas')} style={{ background: 'none', border: '1.5px solid white', color: 'white', padding: '8px 20px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.9rem' }}>
-            Practicar
-          </button>
-          <button onClick={handleLogout} style={{ background: 'none', border: '1.5px solid white', color: 'white', padding: '8px 20px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.9rem' }}>
-            Cerrar sesión
-          </button>
+      {/* NAVBAR */}
+      <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 2.5rem', height: '58px', backgroundColor: T.forest, position: 'sticky', top: 0, zIndex: 100, borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <img src="/logo.png" alt="High Yields" style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} />
+          <span style={{ color: 'white', fontWeight: '800', fontSize: '0.95rem', letterSpacing: '0.06em' }}>HIGH YIELDS</span>
+        </div>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button className="nav-btn" onClick={() => navigate('/areas')}>Practicar</button>
+          <button className="nav-btn" onClick={handleLogout}>Cerrar sesión</button>
         </div>
       </nav>
 
-      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '2.5rem 2rem' }}>
-        <h2 style={{ color: '#14532d', fontSize: '2rem', fontWeight: '800', marginBottom: '0.5rem' }}>Mi progreso</h2>
-        <p style={{ color: '#16a34a', marginBottom: '2rem' }}>Resumen de tu desempeño en High Yields</p>
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '2.5rem 1.5rem' }}>
 
-        {/* CALENDARIO SEMANAL */}
-        <div style={{ backgroundColor: 'white', borderRadius: '16px', padding: '1.5rem', marginBottom: '1.5rem', boxShadow: '0 4px 20px rgba(22,101,52,0.08)' }}>
-          <h3 style={{ color: '#14532d', fontSize: '1rem', fontWeight: '700', marginBottom: '1.2rem' }}>📅 Esta semana</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.5rem' }}>
-            {semana.map((dia, i) => (
-              <div key={i} style={{ textAlign: 'center' }}>
-                <p style={{ fontSize: '0.75rem', fontWeight: '600', color: dia.esHoy ? '#166534' : '#9ca3af', marginBottom: '0.4rem' }}>
-                  {dia.nombre}
-                </p>
-                <div style={{
-                  width: '100%', aspectRatio: '1', borderRadius: '10px', display: 'flex',
-                  flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                  backgroundColor: dia.esFuturo ? '#f9fafb' : dia.activo ? '#dcfce7' : '#f3f4f6',
-                  border: dia.esHoy ? '2px solid #16a34a' : '1.5px solid transparent',
-                  padding: '4px'
-                }}>
-                  {dia.esFuturo ? (
-                    <span style={{ fontSize: '1rem', color: '#d1d5db' }}>—</span>
-                  ) : dia.activo ? (
-                    <>
-                      <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#16a34a' }}>✓</span>
-                      <span style={{ fontSize: '0.65rem', color: '#166534', fontWeight: '600' }}>{dia.minutos}m</span>
-                      <span style={{ fontSize: '0.6rem', color: getMensaje(dia.pct).color, fontWeight: '600' }}>{dia.pct}%</span>
-                    </>
-                  ) : (
-                    <span style={{ fontSize: '1rem', color: '#d1d5db' }}>—</span>
-                  )}
+        {/* Header */}
+        <div style={{ marginBottom: '2rem' }}>
+          <p style={{ fontSize: '0.72rem', fontWeight: '700', color: T.textMuted, letterSpacing: '0.1em', textTransform: 'uppercase', margin: '0 0 6px' }}>Panel de usuario</p>
+          <h1 style={{ fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: '900', color: T.forest, margin: 0, letterSpacing: '-0.02em' }}>Mi progreso</h1>
+        </div>
+
+        {/* SEMANA */}
+        <div className="card" style={{ padding: '1.5rem', marginBottom: '1.25rem' }}>
+          <p style={{ fontSize: '0.78rem', fontWeight: '700', color: T.textMuted, letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 1rem' }}>Esta semana</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '6px' }}>
+            {semana.map((dia, i) => {
+              const nivel = dia.activo ? getNivel(dia.pct) : null
+              return (
+                <div key={i} style={{ textAlign: 'center' }}>
+                  <p style={{ fontSize: '0.68rem', fontWeight: '700', color: dia.esHoy ? T.emerald : T.textMuted, margin: '0 0 5px', letterSpacing: '0.02em' }}>
+                    {dia.nombre}
+                  </p>
+                  <div style={{
+                    aspectRatio: '1', borderRadius: '10px', display: 'flex',
+                    flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                    backgroundColor: dia.esFuturo ? '#f9fafb'
+                                   : dia.activo ? nivel.bg : '#f3f4f6',
+                    border: dia.esHoy ? `2px solid ${T.emerald}` : '1.5px solid transparent',
+                    padding: '4px', gap: '1px'
+                  }}>
+                    {dia.activo ? (
+                      <>
+                        <span style={{ fontSize: '0.72rem', fontWeight: '800', color: nivel.color }}>{dia.pct}%</span>
+                        <span style={{ fontSize: '0.6rem', color: T.textMuted, fontWeight: '500' }}>{dia.preguntas}p</span>
+                      </>
+                    ) : (
+                      <span style={{ fontSize: '0.8rem', color: '#d1d5db' }}>·</span>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
-          <div style={{ display: 'flex', gap: '1.5rem', marginTop: '1rem', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '0.75rem', color: '#166534' }}>✓ Verde = estudió ese día</span>
-            <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>m = minutos estimados</span>
-            <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>% = aciertos del día</span>
+          <div style={{ display: 'flex', gap: '1rem', marginTop: '10px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <div style={{ width: '8px', height: '8px', borderRadius: '2px', backgroundColor: '#dcfce7' }} />
+              <span style={{ fontSize: '0.7rem', color: T.textMuted }}>≥80% aciertos</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <div style={{ width: '8px', height: '8px', borderRadius: '2px', backgroundColor: '#fefce8' }} />
+              <span style={{ fontSize: '0.7rem', color: T.textMuted }}>60–79%</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <div style={{ width: '8px', height: '8px', borderRadius: '2px', backgroundColor: '#fef2f2' }} />
+              <span style={{ fontSize: '0.7rem', color: T.textMuted }}>&lt;60%</span>
+            </div>
           </div>
         </div>
 
         {!stats || stats.total === 0 ? (
-          <div style={{ backgroundColor: 'white', borderRadius: '16px', padding: '3rem', textAlign: 'center', boxShadow: '0 4px 20px rgba(22,101,52,0.1)' }}>
-            <p style={{ fontSize: '3rem', margin: '0 0 1rem' }}>📚</p>
-            <h3 style={{ color: '#14532d', marginBottom: '0.5rem' }}>Aún no has respondido preguntas</h3>
-            <p style={{ color: '#166534', marginBottom: '1.5rem' }}>Empieza a practicar para ver tu progreso aquí</p>
-            <button onClick={() => navigate('/areas')}
-              style={{ backgroundColor: '#16a34a', color: 'white', border: 'none', padding: '12px 28px', borderRadius: '8px', fontSize: '1rem', fontWeight: '600', cursor: 'pointer' }}>
-              Comenzar ahora →
+          <div className="card" style={{ padding: '3rem', textAlign: 'center' }}>
+            <div style={{ width: '56px', height: '56px', backgroundColor: '#dcfce7', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M12 6v6l4 2" stroke={T.emerald} strokeWidth="2" strokeLinecap="round"/>
+                <circle cx="12" cy="12" r="10" stroke={T.emerald} strokeWidth="2"/>
+              </svg>
+            </div>
+            <h3 style={{ color: T.forest, fontSize: '1.1rem', fontWeight: '700', margin: '0 0 6px' }}>Sin actividad aún</h3>
+            <p style={{ color: T.textMuted, fontSize: '0.875rem', margin: '0 0 1.5rem' }}>Responde preguntas para ver tu progreso aquí.</p>
+            <button
+              onClick={() => navigate('/areas')}
+              style={{ backgroundColor: T.emerald, color: 'white', border: 'none', padding: '11px 24px', borderRadius: '8px', fontSize: '0.9rem', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
+              Comenzar a practicar
             </button>
           </div>
         ) : (
           <>
-            {/* STATS GENERALES */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+            {/* STATS CARDS */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px', marginBottom: '1.25rem' }}>
               {[
-                { label: 'Total respondidas', valor: stats.total, color: '#14532d' },
-                { label: 'Correctas', valor: stats.correctas, color: '#16a34a' },
-                { label: 'Incorrectas', valor: stats.incorrectas, color: '#dc2626' },
-                { label: 'Aciertos', valor: `${stats.porcentaje}%`, color: getMensaje(stats.porcentaje).color },
-              ].map((s, i) => (
-                <div key={i} style={{ backgroundColor: 'white', borderRadius: '12px', padding: '1.5rem', textAlign: 'center', boxShadow: '0 4px 20px rgba(22,101,52,0.08)' }}>
-                  <p style={{ fontSize: '2rem', fontWeight: '800', color: s.color, margin: '0 0 4px' }}>{s.valor}</p>
-                  <p style={{ fontSize: '0.8rem', color: '#166534', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{s.label}</p>
+                { label: 'Total',       valor: stats.total,       color: T.forest },
+                { label: 'Correctas',   valor: stats.correctas,   color: T.emerald },
+                { label: 'Incorrectas', valor: stats.incorrectas,  color: '#dc2626' },
+                { label: 'Aciertos',    valor: `${stats.porcentaje}%`, color: getNivel(stats.porcentaje).color },
+              ].map(s => (
+                <div key={s.label} className="card" style={{ padding: '1.25rem', textAlign: 'center' }}>
+                  <p style={{ fontSize: '1.9rem', fontWeight: '900', color: s.color, margin: '0 0 3px', lineHeight: 1, letterSpacing: '-0.02em' }}>{s.valor}</p>
+                  <p style={{ fontSize: '0.72rem', color: T.textMuted, margin: 0, textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: '600' }}>{s.label}</p>
                 </div>
               ))}
             </div>
 
-            {/* BARRA PROGRESO GENERAL */}
-            <div style={{ backgroundColor: 'white', borderRadius: '16px', padding: '1.5rem', marginBottom: '1.5rem', boxShadow: '0 4px 20px rgba(22,101,52,0.08)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-                <span style={{ color: '#14532d', fontWeight: '600' }}>Rendimiento general</span>
-                <span style={{ color: getMensaje(stats.porcentaje).color, fontWeight: '700' }}>{getMensaje(stats.porcentaje).texto}</span>
+            {/* RENDIMIENTO GENERAL */}
+            <div className="card" style={{ padding: '1.5rem', marginBottom: '1.25rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                <p style={{ fontSize: '0.78rem', fontWeight: '700', color: T.textMuted, letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0 }}>Rendimiento general</p>
+                <span style={{ fontSize: '0.82rem', fontWeight: '700', color: getNivel(stats.porcentaje).color }}>{stats.correctas} / {stats.total}</span>
               </div>
-              <div style={{ backgroundColor: '#dcfce7', borderRadius: '999px', height: '16px', overflow: 'hidden' }}>
-                <div style={{ height: '100%', borderRadius: '999px', transition: 'width 1s ease', width: `${stats.porcentaje}%`, backgroundColor: getMensaje(stats.porcentaje).color }} />
+              <div style={{ backgroundColor: '#f1f5f9', borderRadius: '999px', height: '8px', overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${stats.porcentaje}%`, backgroundColor: getNivel(stats.porcentaje).color, borderRadius: '999px', transition: 'width 1s ease' }} />
               </div>
-              <p style={{ color: '#166534', fontSize: '0.85rem', marginTop: '0.5rem' }}>
-                {stats.correctas} de {stats.total} preguntas correctas
-              </p>
             </div>
 
             {/* POR TÓPICO */}
-            <div style={{ backgroundColor: 'white', borderRadius: '16px', padding: '1.5rem', marginBottom: '1.5rem', boxShadow: '0 4px 20px rgba(22,101,52,0.08)' }}>
-              <h3 style={{ color: '#14532d', fontSize: '1rem', fontWeight: '700', marginBottom: '1.2rem' }}>Rendimiento por tópico</h3>
-              {porTopico.map((t, i) => (
-                <div key={i} style={{ marginBottom: '1rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                    <span style={{ color: '#166534', fontSize: '0.9rem', fontWeight: '500' }}>{formatTopico(t.topico)}</span>
-                    <span style={{ color: getMensaje(t.porcentaje).color, fontSize: '0.9rem', fontWeight: '700' }}>{t.porcentaje}% — {t.total} preguntas</span>
-                  </div>
-                  <div style={{ backgroundColor: '#dcfce7', borderRadius: '999px', height: '10px', overflow: 'hidden' }}>
-                    <div style={{ height: '100%', borderRadius: '999px', width: `${t.porcentaje}%`, backgroundColor: getMensaje(t.porcentaje).color, transition: 'width 1s ease' }} />
-                  </div>
-                </div>
-              ))}
+            <div className="card" style={{ padding: '1.5rem', marginBottom: '1.25rem' }}>
+              <p style={{ fontSize: '0.78rem', fontWeight: '700', color: T.textMuted, letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 1.25rem' }}>Por tópico</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                {porTopico.map((t, i) => {
+                  const n = getNivel(t.porcentaje)
+                  return (
+                    <div key={i}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
+                        <span style={{ fontSize: '0.875rem', color: T.text, fontWeight: '500' }}>{formatTopico(t.topico)}</span>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                          <span style={{ fontSize: '0.75rem', color: T.textMuted }}>{t.total} preguntas</span>
+                          <span style={{ fontSize: '0.82rem', fontWeight: '700', color: n.color, backgroundColor: n.bg, padding: '2px 8px', borderRadius: '999px' }}>{t.porcentaje}%</span>
+                        </div>
+                      </div>
+                      <div style={{ backgroundColor: '#f1f5f9', borderRadius: '999px', height: '6px', overflow: 'hidden' }}>
+                        <div style={{ height: '100%', width: `${t.porcentaje}%`, backgroundColor: n.color, borderRadius: '999px', transition: 'width 1s ease' }} />
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
 
-            {/* HISTORIAL POR DÍA */}
+            {/* ACTIVIDAD RECIENTE */}
             {recientes.length > 0 && (
-              <div style={{ backgroundColor: 'white', borderRadius: '16px', padding: '1.5rem', boxShadow: '0 4px 20px rgba(22,101,52,0.08)' }}>
-                <h3 style={{ color: '#14532d', fontSize: '1rem', fontWeight: '700', marginBottom: '1.2rem' }}>Actividad reciente</h3>
-                {recientes.map((r, i) => (
-                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: i < recientes.length - 1 ? '1px solid #f0fdf4' : 'none' }}>
-                    <span style={{ color: '#166534', fontSize: '0.9rem' }}>{formatFecha(r.dia)}</span>
-                    <span style={{ color: '#166534', fontSize: '0.9rem' }}>{r.total} preguntas — {r.total * 2} min</span>
-                    <span style={{ color: getMensaje(r.porcentaje).color, fontWeight: '700', fontSize: '0.9rem' }}>{r.porcentaje}% aciertos</span>
-                  </div>
-                ))}
+              <div className="card" style={{ padding: '1.5rem' }}>
+                <p style={{ fontSize: '0.78rem', fontWeight: '700', color: T.textMuted, letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 1rem' }}>Actividad reciente</p>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  {recientes.map((r, i) => {
+                    const n = getNivel(r.porcentaje)
+                    return (
+                      <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: i < recientes.length - 1 ? `1px solid ${T.border}` : 'none' }}>
+                        <span style={{ fontSize: '0.85rem', color: T.text, fontWeight: '500' }}>{formatFecha(r.dia)}</span>
+                        <span style={{ fontSize: '0.82rem', color: T.textMuted }}>{r.total} preguntas</span>
+                        <span style={{ fontSize: '0.82rem', fontWeight: '700', color: n.color, backgroundColor: n.bg, padding: '2px 10px', borderRadius: '999px' }}>{r.porcentaje}%</span>
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
             )}
           </>
@@ -239,5 +287,3 @@ function Dashboard() {
     </div>
   )
 }
-
-export default Dashboard
