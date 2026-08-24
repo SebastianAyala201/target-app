@@ -19,7 +19,7 @@ const areas = [
   { id: 'anatomia',         nombre: 'Anatomía',         imagen: '/topicos/anatomia.jpg',         preguntas: '+10',    disponible: true  },
   { id: 'histologia',       nombre: 'Histología',       imagen: '/topicos/histologia.jpg',       preguntas: '+26',    disponible: true  },
   { id: 'embriologia',      nombre: 'Embriología',      imagen: '/topicos/embriologia.jpg',      preguntas: '+31',    disponible: true  },
-  { id: 'medicina_interna', nombre: 'Medicina Interna', imagen: '/topicos/medicina_interna.jpg', preguntas: 'Pronto', disponible: true  },
+  { id: 'medicina_interna', nombre: 'Medicina Interna', imagen: '/topicos/medicina_interna.jpg', preguntas: '+200', disponible: true  },
 ]
 
 export default function Areas() {
