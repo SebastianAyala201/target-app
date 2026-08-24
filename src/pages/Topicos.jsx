@@ -57,8 +57,8 @@ const topicos = {
     nombre: 'Medicina Interna',
     descripcion: 'Diagnóstico y tratamiento de enfermedades del adulto.',
     topicos: [
-      { id: 'hematologia', nombre: 'Hematología', imagen: '/topicos/hematologia.jpg', preguntas: 'Pronto', disponible: true  },
-      { id: 'neurologia',  nombre: 'Neurología',  imagen: '/topicos/neurologia.jpg',  preguntas: 'Pronto', disponible: false },
+      { id: 'hematologia', nombre: 'Hematología', imagen: '/topicos/hematologia.jpg', preguntas: 'Disponible', disponible: true  },
+      { id: 'neurologia',  nombre: 'Neurología',  imagen: '/topicos/neurologia.jpg',  preguntas: 'Disponible', disponible: true },
     ]
   },
 }
