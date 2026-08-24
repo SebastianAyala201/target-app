@@ -1,15 +1,15 @@
 import { useNavigate } from 'react-router-dom'
 
 const T = {
-  forest:    '#0f3d2e',
-  pine:      '#1a5c3a',
-  emerald:   '#16a34a',
-  mist:      '#f0faf4',
+  forest:    '#0f2a4a',
+  pine:      '#1a3f6b',
+  emerald:   '#2563a8',
+  mist:      '#e8f2fb',
   surface:   '#ffffff',
-  text:      '#0f1a14',
-  textMuted: '#4a6355',
-  border:    '#c8e6d4',
-  lime:      '#a3e635',
+  text:      '#0f1a2e',
+  textMuted: '#4a6580',
+  border:    '#cbd5e1',
+  lime:      '#60a5d4',
 }
 
 export default function LandingPage() {
@@ -29,7 +29,7 @@ export default function LandingPage() {
         * { box-sizing: border-box; }
 
         .btn-primary {
-          background-color: #16a34a;
+          background-color: #2563a8;
           color: white;
           border: none;
           padding: 13px 32px;
@@ -39,18 +39,18 @@ export default function LandingPage() {
           cursor: pointer;
           letter-spacing: 0.01em;
           transition: background 0.18s, transform 0.12s, box-shadow 0.18s;
-          box-shadow: 0 2px 12px rgba(22,163,74,0.28);
+          box-shadow: 0 2px 12px rgba(37,99,168,0.28);
           font-family: inherit;
         }
         .btn-primary:hover {
-          background-color: #1a5c3a;
+          background-color: #1a3f6b;
           transform: translateY(-1px);
-          box-shadow: 0 6px 20px rgba(22,163,74,0.35);
+          box-shadow: 0 6px 20px rgba(37,99,168,0.35);
         }
         .btn-ghost {
           background: transparent;
-          color: #0f3d2e;
-          border: 1.5px solid #c8e6d4;
+          color: #0f2a4a;
+          border: 1.5px solid #cbd5e1;
           padding: 13px 32px;
           border-radius: 8px;
           font-size: 0.95rem;
@@ -60,8 +60,8 @@ export default function LandingPage() {
           font-family: inherit;
         }
         .btn-ghost:hover {
-          border-color: #16a34a;
-          background: rgba(22,163,74,0.05);
+          border-color: #2563a8;
+          background: rgba(37,99,168,0.05);
         }
         .nav-link {
           background: none;
@@ -93,7 +93,7 @@ export default function LandingPage() {
           background: rgba(255,255,255,0.07);
         }
         .nav-btn-solid {
-          background: #16a34a;
+          background: #2563a8;
           border: none;
           color: white;
           padding: 7px 20px;
@@ -104,13 +104,13 @@ export default function LandingPage() {
           transition: background 0.15s;
           font-family: inherit;
         }
-        .nav-btn-solid:hover { background: #1a5c3a; }
+        .nav-btn-solid:hover { background: #1a3f6b; }
 
         .accent-bar {
           display: inline-block;
           width: 40px;
           height: 4px;
-          background: #a3e635;
+          background: #60a5d4;
           border-radius: 2px;
           margin-bottom: 20px;
         }
@@ -118,9 +118,9 @@ export default function LandingPage() {
         .opcion {
           padding: 9px 13px;
           border-radius: 8px;
-          border: 1.5px solid #c8e6d4;
+          border: 1.5px solid #cbd5e1;
           font-size: 0.8rem;
-          color: #0f1a14;
+          color: #0f1a2e;
           display: flex;
           gap: 8px;
           align-items: center;
@@ -129,9 +129,9 @@ export default function LandingPage() {
           font-family: inherit;
         }
         .opcion.correcta {
-          border-color: #16a34a;
-          background: #dcfce7;
-          color: #0f3d2e;
+          border-color: #2563a8;
+          background: #dbeafe;
+          color: #0f2a4a;
         }
 
         @media (max-width: 768px) {
@@ -193,7 +193,7 @@ export default function LandingPage() {
 
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: '8px',
-            backgroundColor: '#dcfce7', border: '1px solid #bbf7d0',
+            backgroundColor: '#dbeafe', border: '1px solid #bfdbfe',
             borderRadius: '999px', padding: '5px 14px', marginBottom: '20px',
           }}>
             <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: T.emerald }} />
@@ -256,11 +256,10 @@ export default function LandingPage() {
           display: 'flex', flexDirection: 'column', gap: '12px',
         }}>
 
-          {/* Card oscura con imagen */}
           <div style={{
             position: 'relative', borderRadius: '16px', overflow: 'hidden',
             border: `1px solid ${T.border}`,
-            boxShadow: '0 24px 64px rgba(15,61,46,0.15)',
+            boxShadow: '0 24px 64px rgba(15,42,74,0.15)',
           }}>
             <img
               src="/medicina.png"
@@ -269,14 +268,13 @@ export default function LandingPage() {
             />
             <div style={{
               position: 'absolute', inset: 0,
-              background: 'linear-gradient(to top, #0f3d2eee 40%, transparent)',
+              background: 'linear-gradient(to top, #0f2a4aee 40%, transparent)',
             }} />
-            {/* ECG decorativo sobre imagen */}
             <svg style={{ position: 'absolute', bottom: '44px', left: 0, right: 0, width: '100%' }}
               height="32" viewBox="0 0 440 32" preserveAspectRatio="none">
               <polyline
                 points="0,20 80,20 100,20 110,4 120,28 130,2 140,28 150,20 200,20 440,20"
-                fill="none" stroke="#a3e635" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.7"
+                fill="none" stroke="#60a5d4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.7"
               />
             </svg>
             <div style={{ position: 'absolute', bottom: '14px', left: '16px' }}>
@@ -285,26 +283,22 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Mockup pregunta */}
           <div style={{
             backgroundColor: T.surface, borderRadius: '14px', padding: '18px 20px',
-            border: `1px solid ${T.border}`, boxShadow: '0 4px 20px rgba(15,61,46,0.07)',
+            border: `1px solid ${T.border}`, boxShadow: '0 4px 20px rgba(15,42,74,0.07)',
           }}>
-            {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
               <div style={{ display: 'flex', gap: '6px' }}>
-                <span style={{ backgroundColor: '#dcfce7', color: T.pine, fontSize: '0.65rem', fontWeight: '700', padding: '3px 8px', borderRadius: '999px', letterSpacing: '0.04em' }}>CARDIOLOGÍA</span>
-                <span style={{ backgroundColor: '#f0fdf4', color: T.textMuted, fontSize: '0.65rem', fontWeight: '600', padding: '3px 8px', borderRadius: '999px' }}>Pregunta 3 de 10</span>
+                <span style={{ backgroundColor: '#dbeafe', color: T.pine, fontSize: '0.65rem', fontWeight: '700', padding: '3px 8px', borderRadius: '999px', letterSpacing: '0.04em' }}>CARDIOLOGÍA</span>
+                <span style={{ backgroundColor: '#eff6ff', color: T.textMuted, fontSize: '0.65rem', fontWeight: '600', padding: '3px 8px', borderRadius: '999px' }}>Pregunta 3 de 10</span>
               </div>
               <span style={{ fontSize: '0.75rem', fontWeight: '700', color: T.emerald }}>02:34</span>
             </div>
 
-            {/* Enunciado */}
             <p style={{ fontSize: '0.82rem', color: T.text, lineHeight: 1.65, margin: '0 0 14px', fontWeight: '400' }}>
               Paciente de 58 años con disnea progresiva de 3 meses. ECG muestra bloqueo de rama izquierda completo. ¿Cuál es el diagnóstico más probable?
             </p>
 
-            {/* Opciones */}
             <div className="opcion">
               <span style={{ fontWeight: '700', color: T.textMuted, minWidth: '16px' }}>A.</span>
               Cardiopatía isquémica crónica
