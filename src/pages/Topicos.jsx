@@ -1,15 +1,15 @@
 import { useNavigate, useParams } from 'react-router-dom'
 
 const T = {
-  forest:    '#0f3d2e',
-  pine:      '#1a5c3a',
-  emerald:   '#16a34a',
-  mist:      '#f0faf4',
+  forest:    '#0f2a4a',
+  pine:      '#1a3f6b',
+  emerald:   '#2563a8',
+  mist:      '#e8f2fb',
   surface:   '#ffffff',
-  text:      '#0f1a14',
-  textMuted: '#4a6355',
-  border:    '#c8e6d4',
-  lime:      '#a3e635',
+  text:      '#0f1a2e',
+  textMuted: '#4a6580',
+  border:    '#cbd5e1',
+  lime:      '#60a5d4',
 }
 
 const topicos = {
@@ -17,18 +17,18 @@ const topicos = {
     nombre: 'Fisiología',
     descripcion: 'Mecanismos fundamentales del funcionamiento del cuerpo humano.',
     topicos: [
-      { id: 'fisiologia_celular',  nombre: 'Fisiología Celular',  imagen: '/topicos/fisiologia_celular.jpg',  preguntas: '19', disponible: true  },
+      { id: 'fisiologia_celular',  nombre: 'Fisiología Celular',  imagen: '/topicos/fisiologia_celular.jpg',  preguntas: '19',    disponible: true  },
       { id: 'fisiologia_nerviosa', nombre: 'Fisiología Nerviosa', imagen: '/topicos/fisiologia_nerviosa.jpg', preguntas: 'Pronto', disponible: true },
-      { id: 'fisiologia_renal',    nombre: 'Fisiología Renal',    imagen: '/topicos/fisiologia_renal.jpg',    preguntas: '4',  disponible: true  },
+      { id: 'fisiologia_renal',    nombre: 'Fisiología Renal',    imagen: '/topicos/fisiologia_renal.jpg',    preguntas: '4',     disponible: true  },
     ]
   },
   fisiopatologia: {
     nombre: 'Fisiopatología',
     descripcion: 'Alteraciones de los mecanismos fisiológicos en la enfermedad.',
     topicos: [
-      { id: 'reumatologia',     nombre: 'Reumatología',     imagen: '/topicos/reumatologia.jpg',     preguntas: 'Pronto', disponible: true },
-      { id: 'nefrologia',       nombre: 'Nefrología',       imagen: '/topicos/nefrologia.jpg',       preguntas: 'Pronto', disponible: true },
-      { id: 'gastroenterologia',nombre: 'Gastroenterología',imagen: '/topicos/gastroenterologia.jpg',preguntas: 'Pronto', disponible: true },
+      { id: 'reumatologia',      nombre: 'Reumatología',      imagen: '/topicos/reumatologia.jpg',      preguntas: 'Pronto', disponible: true },
+      { id: 'nefrologia',        nombre: 'Nefrología',        imagen: '/topicos/nefrologia.jpg',        preguntas: 'Pronto', disponible: true },
+      { id: 'gastroenterologia', nombre: 'Gastroenterología', imagen: '/topicos/gastroenterologia.jpg', preguntas: 'Pronto', disponible: true },
     ]
   },
   anatomia: {
@@ -49,15 +49,15 @@ const topicos = {
     nombre: 'Embriología',
     descripcion: 'Desarrollo y formación de los órganos durante la gestación.',
     topicos: [
-      { id: 'embriologia_cardiovascular', nombre: 'Cardiovascular', imagen: '/topicos/embriologia_cardiovascular.jpg', preguntas: '30', disponible: true  },
-      { id: 'embriologia_renal',          nombre: 'Renal',          imagen: '/topicos/embriologia_renal.jpg',          preguntas: '1',  disponible: true  },
+      { id: 'embriologia_cardiovascular', nombre: 'Cardiovascular', imagen: '/topicos/embriologia_cardiovascular.jpg', preguntas: '30', disponible: true },
+      { id: 'embriologia_renal',          nombre: 'Renal',          imagen: '/topicos/embriologia_renal.jpg',          preguntas: '1',  disponible: true },
     ]
   },
   medicina_interna: {
     nombre: 'Medicina Interna',
     descripcion: 'Diagnóstico y tratamiento de enfermedades del adulto.',
     topicos: [
-      { id: 'hematologia', nombre: 'Hematología', imagen: '/topicos/hematologia.jpg', preguntas: 'Pronto', disponible: true },
+      { id: 'hematologia', nombre: 'Hematología', imagen: '/topicos/hematologia.jpg', preguntas: 'Pronto', disponible: true  },
       { id: 'neurologia',  nombre: 'Neurología',  imagen: '/topicos/neurologia.jpg',  preguntas: 'Pronto', disponible: false },
     ]
   },
@@ -69,7 +69,7 @@ export default function Topicos() {
   const areaData = topicos[area]
 
   if (!areaData) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: T.mist, fontFamily: 'inherit' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: T.mist }}>
       <p style={{ color: T.textMuted }}>Área no encontrada.</p>
     </div>
   )
@@ -95,7 +95,7 @@ export default function Topicos() {
           background: white;
           border-radius: 14px;
           overflow: hidden;
-          border: 1px solid #c8e6d4;
+          border: 1px solid #cbd5e1;
           cursor: pointer;
           transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
           display: flex;
@@ -103,8 +103,8 @@ export default function Topicos() {
         }
         .topico-card:hover {
           transform: translateY(-4px);
-          box-shadow: 0 12px 40px rgba(15,61,46,0.14);
-          border-color: #16a34a;
+          box-shadow: 0 12px 40px rgba(15,42,74,0.14);
+          border-color: #2563a8;
         }
         .topico-card.disabled {
           cursor: default;
@@ -113,7 +113,7 @@ export default function Topicos() {
         .topico-card.disabled:hover {
           transform: none;
           box-shadow: none;
-          border-color: #c8e6d4;
+          border-color: #cbd5e1;
         }
 
         .nav-btn {
@@ -161,10 +161,7 @@ export default function Topicos() {
 
         {/* Breadcrumb */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1.5rem' }}>
-          <span
-            style={{ fontSize: '0.82rem', color: T.textMuted, cursor: 'pointer', fontWeight: '500' }}
-            onClick={() => navigate('/areas')}
-          >
+          <span style={{ fontSize: '0.82rem', color: T.textMuted, cursor: 'pointer', fontWeight: '500' }} onClick={() => navigate('/areas')}>
             Áreas
           </span>
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -181,7 +178,7 @@ export default function Topicos() {
           <p style={{ fontSize: '0.95rem', color: T.textMuted, margin: '0 0 16px' }}>
             {areaData.descripcion}
           </p>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', backgroundColor: '#dcfce7', border: '1px solid #bbf7d0', borderRadius: '999px', padding: '4px 12px' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', backgroundColor: '#dbeafe', border: '1px solid #bfdbfe', borderRadius: '999px', padding: '4px 12px' }}>
             <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: T.emerald }} />
             <span style={{ fontSize: '0.75rem', fontWeight: '700', color: T.pine }}>
               {disponibles} {disponibles === 1 ? 'tópico disponible' : 'tópicos disponibles'}
@@ -201,15 +198,13 @@ export default function Topicos() {
               className={`topico-card${!top.disponible ? ' disabled' : ''}`}
               onClick={() => handleTopico(top)}
             >
-              {/* Imagen */}
-              <div style={{ height: '150px', backgroundColor: '#dcfce7', position: 'relative', overflow: 'hidden' }}>
+              <div style={{ height: '150px', backgroundColor: '#dbeafe', position: 'relative', overflow: 'hidden' }}>
                 <img
                   src={top.imagen}
                   alt={top.nombre}
                   style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                   onError={e => { e.target.style.display = 'none' }}
                 />
-                {/* Badge preguntas */}
                 <div style={{
                   position: 'absolute', top: '10px', right: '10px',
                   backgroundColor: top.disponible ? T.forest : '#6b7280',
@@ -222,7 +217,6 @@ export default function Topicos() {
                 </div>
               </div>
 
-              {/* Info */}
               <div style={{ padding: '1.1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                   <h3 style={{ color: T.forest, fontSize: '1rem', fontWeight: '700', margin: '0 0 3px', letterSpacing: '-0.01em' }}>
@@ -236,7 +230,7 @@ export default function Topicos() {
                 {top.disponible && (
                   <div style={{
                     width: '32px', height: '32px', borderRadius: '50%',
-                    backgroundColor: '#dcfce7', border: `1.5px solid ${T.border}`,
+                    backgroundColor: '#dbeafe', border: `1.5px solid ${T.border}`,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     flexShrink: 0,
                   }}>

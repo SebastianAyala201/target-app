@@ -3,19 +3,19 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
 const T = {
-  forest:    '#0f3d2e',
-  pine:      '#1a5c3a',
-  emerald:   '#16a34a',
-  mist:      '#f0faf4',
+  forest:    '#0f2a4a',
+  pine:      '#1a3f6b',
+  emerald:   '#2563a8',
+  mist:      '#e8f2fb',
   surface:   '#ffffff',
-  text:      '#0f1a14',
-  textMuted: '#4a6355',
-  border:    '#c8e6d4',
-  lime:      '#a3e635',
+  text:      '#0f1a2e',
+  textMuted: '#4a6580',
+  border:    '#cbd5e1',
+  accent:    '#60a5d4',
 }
 
 const getNivel = (pct) =>
-  pct >= 80 ? { color: T.emerald, bg: '#dcfce7' }
+  pct >= 80 ? { color: T.emerald, bg: '#dbeafe' }
 : pct >= 60 ? { color: '#ca8a04', bg: '#fefce8' }
 : { color: '#dc2626', bg: '#fef2f2' }
 
@@ -122,8 +122,8 @@ export default function Dashboard() {
         }
         .nav-btn:hover { border-color: rgba(255,255,255,0.7); color: white; }
         .card {
-          background: white; border-radius: 14px; border: 1px solid #c8e6d4;
-          box-shadow: 0 2px 16px rgba(15,61,46,0.06);
+          background: white; border-radius: 14px; border: 1px solid #cbd5e1;
+          box-shadow: 0 2px 16px rgba(15,42,74,0.06);
         }
       `}</style>
 
@@ -181,7 +181,7 @@ export default function Dashboard() {
           </div>
           <div style={{ display: 'flex', gap: '1rem', marginTop: '10px', flexWrap: 'wrap' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <div style={{ width: '8px', height: '8px', borderRadius: '2px', backgroundColor: '#dcfce7' }} />
+              <div style={{ width: '8px', height: '8px', borderRadius: '2px', backgroundColor: '#dbeafe' }} />
               <span style={{ fontSize: '0.7rem', color: T.textMuted }}>≥80% aciertos</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
@@ -197,7 +197,7 @@ export default function Dashboard() {
 
         {!stats || stats.total === 0 ? (
           <div className="card" style={{ padding: '3rem', textAlign: 'center' }}>
-            <div style={{ width: '56px', height: '56px', backgroundColor: '#dcfce7', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
+            <div style={{ width: '56px', height: '56px', backgroundColor: '#dbeafe', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                 <path d="M12 6v6l4 2" stroke={T.emerald} strokeWidth="2" strokeLinecap="round"/>
                 <circle cx="12" cy="12" r="10" stroke={T.emerald} strokeWidth="2"/>

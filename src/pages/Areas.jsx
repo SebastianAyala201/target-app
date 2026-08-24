@@ -2,24 +2,24 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
 const T = {
-  forest:    '#0f3d2e',
-  pine:      '#1a5c3a',
-  emerald:   '#16a34a',
-  mist:      '#f0faf4',
+  forest:    '#0f2a4a',
+  pine:      '#1a3f6b',
+  emerald:   '#2563a8',
+  mist:      '#e8f2fb',
   surface:   '#ffffff',
-  text:      '#0f1a14',
-  textMuted: '#4a6355',
-  border:    '#c8e6d4',
-  lime:      '#a3e635',
+  text:      '#0f1a2e',
+  textMuted: '#4a6580',
+  border:    '#cbd5e1',
+  lime:      '#60a5d4',
 }
 
 const areas = [
-  { id: 'fisiologia',       nombre: 'Fisiología',       imagen: '/topicos/fisiologia.jpg',       preguntas: '+23',  disponible: true  },
-  { id: 'fisiopatologia',   nombre: 'Fisiopatología',   imagen: '/topicos/fisiopatologia.jpg',   preguntas: '+40',  disponible: true  },
-  { id: 'anatomia',         nombre: 'Anatomía',         imagen: '/topicos/anatomia.jpg',         preguntas: '+10',  disponible: true  },
-  { id: 'histologia',       nombre: 'Histología',       imagen: '/topicos/histologia.jpg',       preguntas: '+26',  disponible: true  },
-  { id: 'embriologia',      nombre: 'Embriología',      imagen: '/topicos/embriologia.jpg',      preguntas: '+31',  disponible: true  },
-  { id: 'medicina_interna', nombre: 'Medicina Interna', imagen: '/topicos/medicina_interna.jpg', preguntas: 'Pronto', disponible: true },
+  { id: 'fisiologia',       nombre: 'Fisiología',       imagen: '/topicos/fisiologia.jpg',       preguntas: '+23',    disponible: true  },
+  { id: 'fisiopatologia',   nombre: 'Fisiopatología',   imagen: '/topicos/fisiopatologia.jpg',   preguntas: '+40',    disponible: true  },
+  { id: 'anatomia',         nombre: 'Anatomía',         imagen: '/topicos/anatomia.jpg',         preguntas: '+10',    disponible: true  },
+  { id: 'histologia',       nombre: 'Histología',       imagen: '/topicos/histologia.jpg',       preguntas: '+26',    disponible: true  },
+  { id: 'embriologia',      nombre: 'Embriología',      imagen: '/topicos/embriologia.jpg',      preguntas: '+31',    disponible: true  },
+  { id: 'medicina_interna', nombre: 'Medicina Interna', imagen: '/topicos/medicina_interna.jpg', preguntas: 'Pronto', disponible: true  },
 ]
 
 export default function Areas() {
@@ -49,7 +49,7 @@ export default function Areas() {
           background: white;
           border-radius: 14px;
           overflow: hidden;
-          border: 1px solid #c8e6d4;
+          border: 1px solid #cbd5e1;
           cursor: pointer;
           transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
           display: flex;
@@ -57,8 +57,8 @@ export default function Areas() {
         }
         .area-card:hover {
           transform: translateY(-4px);
-          box-shadow: 0 12px 40px rgba(15,61,46,0.14);
-          border-color: #16a34a;
+          box-shadow: 0 12px 40px rgba(15,42,74,0.14);
+          border-color: #2563a8;
         }
         .area-card.disabled {
           cursor: default;
@@ -67,7 +67,7 @@ export default function Areas() {
         .area-card.disabled:hover {
           transform: none;
           box-shadow: none;
-          border-color: #c8e6d4;
+          border-color: #cbd5e1;
         }
 
         .nav-btn {
@@ -108,7 +108,6 @@ export default function Areas() {
 
       <div style={{ maxWidth: '1060px', margin: '0 auto', padding: '3rem 2rem' }}>
 
-        {/* Header */}
         <div style={{ marginBottom: '2.5rem' }}>
           <p style={{ fontSize: '0.75rem', fontWeight: '700', color: T.textMuted, letterSpacing: '0.1em', textTransform: 'uppercase', margin: '0 0 8px' }}>
             Banco de preguntas
@@ -121,7 +120,6 @@ export default function Areas() {
           </p>
         </div>
 
-        {/* Grid */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
@@ -133,15 +131,13 @@ export default function Areas() {
               className={`area-card${!area.disponible ? ' disabled' : ''}`}
               onClick={() => handleArea(area)}
             >
-              {/* Imagen */}
-              <div style={{ height: '150px', backgroundColor: '#dcfce7', position: 'relative', overflow: 'hidden' }}>
+              <div style={{ height: '150px', backgroundColor: '#dbeafe', position: 'relative', overflow: 'hidden' }}>
                 <img
                   src={area.imagen}
                   alt={area.nombre}
                   style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                   onError={e => { e.target.style.display = 'none' }}
                 />
-                {/* Badge preguntas */}
                 <div style={{
                   position: 'absolute', top: '10px', right: '10px',
                   backgroundColor: area.disponible ? T.forest : '#6b7280',
@@ -154,7 +150,6 @@ export default function Areas() {
                 </div>
               </div>
 
-              {/* Info */}
               <div style={{ padding: '1.1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                   <h3 style={{ color: T.forest, fontSize: '1rem', fontWeight: '700', margin: '0 0 3px', letterSpacing: '-0.01em' }}>
@@ -168,7 +163,7 @@ export default function Areas() {
                 {area.disponible && (
                   <div style={{
                     width: '32px', height: '32px', borderRadius: '50%',
-                    backgroundColor: '#dcfce7', border: `1.5px solid ${T.border}`,
+                    backgroundColor: '#dbeafe', border: `1.5px solid ${T.border}`,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     flexShrink: 0,
                   }}>

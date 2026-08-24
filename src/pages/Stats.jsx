@@ -1,15 +1,15 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 
 const T = {
-  forest:    '#0f3d2e',
-  pine:      '#1a5c3a',
-  emerald:   '#16a34a',
-  mist:      '#f0faf4',
+  forest:    '#0f2a4a',
+  pine:      '#1a3f6b',
+  emerald:   '#2563a8',
+  mist:      '#e8f2fb',
   surface:   '#ffffff',
-  text:      '#0f1a14',
-  textMuted: '#4a6355',
-  border:    '#c8e6d4',
-  lime:      '#a3e635',
+  text:      '#0f1a2e',
+  textMuted: '#4a6580',
+  border:    '#cbd5e1',
+  accent:    '#60a5d4',
 }
 
 export default function Stats() {
@@ -24,7 +24,7 @@ export default function Stats() {
   const respondidas = respuestas.length
   const porcentaje = respondidas > 0 ? Math.round((correctas / respondidas) * 100) : 0
 
-  const nivel = porcentaje >= 80 ? { texto: 'Excelente', color: T.emerald, bg: '#dcfce7', border: '#bbf7d0' }
+  const nivel = porcentaje >= 80 ? { texto: 'Excelente', color: T.emerald, bg: '#dbeafe', border: '#bfdbfe' }
               : porcentaje >= 60 ? { texto: 'Buen trabajo', color: '#ca8a04', bg: '#fefce8', border: '#fde047' }
               : { texto: 'Sigue practicando', color: '#dc2626', bg: '#fef2f2', border: '#fca5a5' }
 
@@ -39,19 +39,19 @@ export default function Stats() {
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         * { box-sizing: border-box; }
         .btn-primary {
-          background-color: #16a34a; color: white; border: none;
+          background-color: #2563a8; color: white; border: none;
           padding: 12px 28px; border-radius: 8px; font-size: 0.9rem;
           font-weight: 700; cursor: pointer; font-family: inherit;
           transition: background 0.15s;
         }
-        .btn-primary:hover { background-color: #1a5c3a; }
+        .btn-primary:hover { background-color: #1a3f6b; }
         .btn-sec {
-          background: transparent; color: #4a6355;
-          border: 1.5px solid #c8e6d4; padding: 12px 24px;
+          background: transparent; color: #4a6580;
+          border: 1.5px solid #cbd5e1; padding: 12px 24px;
           border-radius: 8px; font-size: 0.9rem; cursor: pointer;
           font-family: inherit; transition: border-color 0.15s, color 0.15s;
         }
-        .btn-sec:hover { border-color: #16a34a; color: #0f3d2e; }
+        .btn-sec:hover { border-color: #2563a8; color: #0f2a4a; }
         .nav-btn {
           background: transparent; border: 1.5px solid rgba(255,255,255,0.3);
           color: rgba(255,255,255,0.85); padding: 7px 18px; border-radius: 7px;
@@ -86,13 +86,13 @@ export default function Stats() {
         </div>
 
         {/* Card principal — círculo + stats */}
-        <div style={{ backgroundColor: T.surface, borderRadius: '16px', padding: '2rem', border: `1px solid ${T.border}`, boxShadow: '0 4px 24px rgba(15,61,46,0.08)', marginBottom: '1.25rem' }}>
+        <div style={{ backgroundColor: T.surface, borderRadius: '16px', padding: '2rem', border: `1px solid ${T.border}`, boxShadow: '0 4px 24px rgba(15,42,74,0.08)', marginBottom: '1.25rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem', flexWrap: 'wrap' }}>
 
             {/* Círculo de progreso SVG */}
             <div style={{ position: 'relative', width: circleSize, height: circleSize, flexShrink: 0 }}>
               <svg width={circleSize} height={circleSize} style={{ transform: 'rotate(-90deg)' }}>
-                <circle cx={circleSize/2} cy={circleSize/2} r={radius} fill="none" stroke="#e8f5e9" strokeWidth="10"/>
+                <circle cx={circleSize/2} cy={circleSize/2} r={radius} fill="none" stroke="#dbeafe" strokeWidth="10"/>
                 <circle
                   cx={circleSize/2} cy={circleSize/2} r={radius}
                   fill="none" stroke={nivel.color} strokeWidth="10"
@@ -138,7 +138,7 @@ export default function Stats() {
         )}
 
         {/* Barra visual correctas/incorrectas */}
-        <div style={{ backgroundColor: T.surface, borderRadius: '14px', padding: '1.5rem', border: `1px solid ${T.border}`, boxShadow: '0 2px 12px rgba(15,61,46,0.06)', marginBottom: '2rem' }}>
+        <div style={{ backgroundColor: T.surface, borderRadius: '14px', padding: '1.5rem', border: `1px solid ${T.border}`, boxShadow: '0 2px 12px rgba(15,42,74,0.06)', marginBottom: '2rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
             <span style={{ fontSize: '0.82rem', fontWeight: '600', color: T.textMuted }}>Distribución de respuestas</span>
             <span style={{ fontSize: '0.82rem', fontWeight: '700', color: nivel.color }}>{correctas} / {respondidas}</span>

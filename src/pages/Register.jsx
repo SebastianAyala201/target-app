@@ -3,18 +3,18 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
 const T = {
-  forest:    '#0f3d2e',
-  pine:      '#1a5c3a',
-  emerald:   '#16a34a',
-  mist:      '#f0faf4',
-  surface:   '#ffffff',
-  text:      '#0f1a14',
-  textMuted: '#4a6355',
-  border:    '#c8e6d4',
-  lime:      '#a3e635',
-  error:     '#dc2626',
-  errorBg:   '#fef2f2',
-  errorBorder:'#fca5a5',
+  forest:      '#0f2a4a',
+  pine:        '#1a3f6b',
+  emerald:     '#2563a8',
+  mist:        '#e8f2fb',
+  surface:     '#ffffff',
+  text:        '#0f1a2e',
+  textMuted:   '#4a6580',
+  border:      '#cbd5e1',
+  lime:        '#60a5d4',
+  error:       '#dc2626',
+  errorBg:     '#fef2f2',
+  errorBorder: '#fca5a5',
 }
 
 export default function Register() {
@@ -75,7 +75,7 @@ export default function Register() {
     outline: 'none',
     boxSizing: 'border-box',
     color: T.text,
-    backgroundColor: focused === name ? '#f0fdf4' : T.surface,
+    backgroundColor: focused === name ? '#eff6ff' : T.surface,
     transition: 'border-color 0.15s, background 0.15s',
     fontFamily: 'inherit',
   })
@@ -108,7 +108,7 @@ export default function Register() {
 
         .btn-submit {
           width: 100%;
-          background-color: #16a34a;
+          background-color: #2563a8;
           color: white;
           border: none;
           padding: 13px;
@@ -121,19 +121,19 @@ export default function Register() {
           letter-spacing: 0.01em;
         }
         .btn-submit:hover:not(:disabled) {
-          background-color: #1a5c3a;
+          background-color: #1a3f6b;
           transform: translateY(-1px);
         }
         .btn-submit:disabled { opacity: 0.65; cursor: default; }
 
         .link-text {
-          color: #16a34a;
+          color: #2563a8;
           font-weight: 700;
           cursor: pointer;
           border-bottom: 1.5px solid transparent;
           transition: border-color 0.15s;
         }
-        .link-text:hover { border-bottom-color: #16a34a; }
+        .link-text:hover { border-bottom-color: #2563a8; }
 
         .step-item {
           display: flex;
@@ -147,7 +147,7 @@ export default function Register() {
         @media (max-width: 768px) { .left-panel { display: none !important; } }
       `}</style>
 
-      {/* ── PANEL IZQUIERDO ── */}
+      {/* PANEL IZQUIERDO */}
       <div className="left-panel" style={{
         width: '40%',
         backgroundColor: T.forest,
@@ -158,13 +158,11 @@ export default function Register() {
         position: 'relative',
         overflow: 'hidden',
       }}>
-        {/* Logo */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <img src="/logo.png" alt="High Yields" style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover' }} />
           <span style={{ color: 'white', fontWeight: '800', fontSize: '1rem', letterSpacing: '0.06em' }}>HIGH YIELDS</span>
         </div>
 
-        {/* Contenido */}
         <div>
           <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.72rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', margin: '0 0 12px' }}>
             Empieza hoy
@@ -173,7 +171,6 @@ export default function Register() {
             Crea tu cuenta y accede al banco de preguntas.
           </h2>
 
-          {/* Pasos */}
           <div className="step-item">
             <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: T.lime, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <span style={{ fontSize: '0.75rem', fontWeight: '800', color: T.forest }}>1</span>
@@ -185,7 +182,7 @@ export default function Register() {
           </div>
 
           <div className="step-item">
-            <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: 'rgba(163,230,53,0.15)', border: '1px solid rgba(163,230,53,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: 'rgba(96,165,212,0.15)', border: '1px solid rgba(96,165,212,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <span style={{ fontSize: '0.75rem', fontWeight: '800', color: T.lime }}>2</span>
             </div>
             <div>
@@ -195,7 +192,7 @@ export default function Register() {
           </div>
 
           <div className="step-item">
-            <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: 'rgba(163,230,53,0.15)', border: '1px solid rgba(163,230,53,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: 'rgba(96,165,212,0.15)', border: '1px solid rgba(96,165,212,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <span style={{ fontSize: '0.75rem', fontWeight: '800', color: T.lime }}>3</span>
             </div>
             <div>
@@ -207,12 +204,11 @@ export default function Register() {
 
         <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.75rem', margin: 0 }}>© 2026 High Yields</p>
 
-        {/* Círculos decorativos */}
-        <div style={{ position: 'absolute', bottom: '-80px', right: '-80px', width: '260px', height: '260px', borderRadius: '50%', border: '1px solid rgba(163,230,53,0.1)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', bottom: '-40px', right: '-40px', width: '160px', height: '160px', borderRadius: '50%', border: '1px solid rgba(163,230,53,0.07)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: '-80px', right: '-80px', width: '260px', height: '260px', borderRadius: '50%', border: '1px solid rgba(96,165,212,0.1)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: '-40px', right: '-40px', width: '160px', height: '160px', borderRadius: '50%', border: '1px solid rgba(96,165,212,0.07)', pointerEvents: 'none' }} />
       </div>
 
-      {/* ── PANEL DERECHO — FORMULARIO ── */}
+      {/* PANEL DERECHO */}
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', overflowY: 'auto' }}>
         <div style={{ width: '100%', maxWidth: '420px', paddingTop: '1rem', paddingBottom: '2rem' }}>
 
@@ -231,42 +227,27 @@ export default function Register() {
             </div>
           )}
 
-          {/* Nombre + Apellido paterno */}
           <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
-            <div style={{ flex: 1 }}>
-              <Field label="Nombre *" name="nombre" placeholder="Juan" />
-            </div>
-            <div style={{ flex: 1 }}>
-              <Field label="Apellido paterno *" name="apellidoPaterno" placeholder="Pérez" />
-            </div>
+            <div style={{ flex: 1 }}><Field label="Nombre *" name="nombre" placeholder="Juan" /></div>
+            <div style={{ flex: 1 }}><Field label="Apellido paterno *" name="apellidoPaterno" placeholder="Pérez" /></div>
           </div>
 
-          {/* Apellido materno */}
           <div style={{ marginBottom: '10px' }}>
             <Field label="Apellido materno" name="apellidoMaterno" placeholder="García (opcional)" />
           </div>
-
-          {/* Username */}
           <div style={{ marginBottom: '10px' }}>
             <Field label="Nombre de usuario *" name="username" placeholder="juanperez123" />
           </div>
-
-          {/* Email */}
           <div style={{ marginBottom: '10px' }}>
             <Field label="Correo electrónico *" name="email" type="email" placeholder="juan@email.com" />
           </div>
-
-          {/* Password */}
           <div style={{ marginBottom: '10px' }}>
             <Field label="Contraseña *" name="password" type="password" placeholder="Mínimo 8 caracteres" />
           </div>
-
-          {/* Confirm password */}
           <div style={{ marginBottom: '1.25rem' }}>
             <Field label="Confirmar contraseña *" name="confirmPassword" type="password" placeholder="Repite tu contraseña" />
           </div>
 
-          {/* Términos */}
           <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer', marginBottom: '1.5rem' }}>
             <input
               type="checkbox" name="terms"
@@ -275,9 +256,7 @@ export default function Register() {
             />
             <span style={{ fontSize: '0.82rem', color: T.textMuted, lineHeight: 1.5 }}>
               Acepto los{' '}
-              <span
-                className="link-text"
-                onClick={(e) => { e.preventDefault(); window.open('/terminos', '_blank') }}>
+              <span className="link-text" onClick={(e) => { e.preventDefault(); window.open('/terminos', '_blank') }}>
                 términos y condiciones
               </span>
               {' '}de High Yields.
@@ -290,9 +269,7 @@ export default function Register() {
 
           <p style={{ textAlign: 'center', marginTop: '1.25rem', fontSize: '0.875rem', color: T.textMuted }}>
             ¿Ya tienes cuenta?{' '}
-            <span className="link-text" onClick={() => navigate('/signin')}>
-              Inicia sesión
-            </span>
+            <span className="link-text" onClick={() => navigate('/signin')}>Inicia sesión</span>
           </p>
 
         </div>

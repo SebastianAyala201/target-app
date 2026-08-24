@@ -3,19 +3,19 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
 const T = {
-  forest:    '#0f3d2e',
-  pine:      '#1a5c3a',
-  emerald:   '#16a34a',
-  mist:      '#f0faf4',
-  surface:   '#ffffff',
-  text:      '#0f1a14',
-  textMuted: '#4a6355',
-  border:    '#c8e6d4',
-  borderFocus: '#16a34a',
-  lime:      '#a3e635',
-  error:     '#dc2626',
-  errorBg:   '#fef2f2',
-  errorBorder:'#fca5a5',
+  forest:      '#0f2a4a',
+  pine:        '#1a3f6b',
+  emerald:     '#2563a8',
+  mist:        '#e8f2fb',
+  surface:     '#ffffff',
+  text:        '#0f1a2e',
+  textMuted:   '#4a6580',
+  border:      '#cbd5e1',
+  borderFocus: '#2563a8',
+  lime:        '#60a5d4',
+  error:       '#dc2626',
+  errorBg:     '#fef2f2',
+  errorBorder: '#fca5a5',
 }
 
 export default function SignIn() {
@@ -55,7 +55,7 @@ export default function SignIn() {
     outline: 'none',
     boxSizing: 'border-box',
     color: T.text,
-    backgroundColor: focused === name ? '#f0fdf4' : T.surface,
+    backgroundColor: focused === name ? '#eff6ff' : T.surface,
     transition: 'border-color 0.15s, background 0.15s',
     fontFamily: 'inherit',
   })
@@ -73,7 +73,7 @@ export default function SignIn() {
 
         .btn-submit {
           width: 100%;
-          background-color: #16a34a;
+          background-color: #2563a8;
           color: white;
           border: none;
           padding: 13px;
@@ -87,7 +87,7 @@ export default function SignIn() {
           margin-top: 1.5rem;
         }
         .btn-submit:hover:not(:disabled) {
-          background-color: #1a5c3a;
+          background-color: #1a3f6b;
           transform: translateY(-1px);
         }
         .btn-submit:disabled { opacity: 0.65; cursor: default; }
@@ -99,8 +99,8 @@ export default function SignIn() {
           justify-content: center;
           gap: 10px;
           background: white;
-          color: #0f1a14;
-          border: 1.5px solid #c8e6d4;
+          color: #0f1a2e;
+          border: 1.5px solid #cbd5e1;
           padding: 12px;
           border-radius: 8px;
           font-size: 0.9rem;
@@ -110,22 +110,22 @@ export default function SignIn() {
           font-family: inherit;
         }
         .btn-google:hover {
-          border-color: #16a34a;
-          background: #f0fdf4;
+          border-color: #2563a8;
+          background: #eff6ff;
         }
 
         .link-text {
-          color: #16a34a;
+          color: #2563a8;
           font-weight: 700;
           cursor: pointer;
           text-decoration: none;
           border-bottom: 1.5px solid transparent;
           transition: border-color 0.15s;
         }
-        .link-text:hover { border-bottom-color: #16a34a; }
+        .link-text:hover { border-bottom-color: #2563a8; }
       `}</style>
 
-      {/* Panel izquierdo — decorativo */}
+      {/* Panel izquierdo */}
       <div style={{
         width: '42%',
         backgroundColor: T.forest,
@@ -140,19 +140,16 @@ export default function SignIn() {
           @media (max-width: 768px) { .left-panel { display: none !important; } }
         `}</style>
 
-        {/* Logo */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <img src="/logo.png" alt="High Yields" style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover' }} />
           <span style={{ color: 'white', fontWeight: '800', fontSize: '1rem', letterSpacing: '0.06em' }}>HIGH YIELDS</span>
         </div>
 
-        {/* Contenido central */}
         <div>
-          {/* ECG decorativo */}
           <svg width="100%" height="48" viewBox="0 0 300 48" style={{ marginBottom: '2rem', opacity: 0.4 }}>
             <polyline
               points="0,28 60,28 80,28 90,8 100,40 110,4 120,40 130,28 180,28 300,28"
-              fill="none" stroke="#a3e635" strokeWidth="2.5"
+              fill="none" stroke="#60a5d4" strokeWidth="2.5"
               strokeLinecap="round" strokeLinejoin="round"
             />
           </svg>
@@ -167,7 +164,6 @@ export default function SignIn() {
             Más de 500 preguntas clínicas con explicaciones detalladas, modo examen cronometrado y seguimiento de tu progreso.
           </p>
 
-          {/* Stats mini */}
           <div style={{ display: 'flex', gap: '2rem', marginTop: '2.5rem' }}>
             {[{ n: '+500', l: 'Preguntas' }, { n: '6', l: 'Especialidades' }, { n: '100%', l: 'Gratuito' }].map(s => (
               <div key={s.l}>
@@ -178,27 +174,25 @@ export default function SignIn() {
           </div>
         </div>
 
-        {/* Footer izquierdo */}
         <p style={{ color: 'rgba(255,255,255,0.25)', fontSize: '0.75rem', margin: 0 }}>
           © 2026 High Yields
         </p>
 
-        {/* Círculo decorativo fondo */}
         <div style={{
           position: 'absolute', bottom: '-80px', right: '-80px',
           width: '280px', height: '280px', borderRadius: '50%',
-          border: '1px solid rgba(163,230,53,0.12)',
+          border: '1px solid rgba(96,165,212,0.12)',
           pointerEvents: 'none',
         }} />
         <div style={{
           position: 'absolute', bottom: '-40px', right: '-40px',
           width: '180px', height: '180px', borderRadius: '50%',
-          border: '1px solid rgba(163,230,53,0.08)',
+          border: '1px solid rgba(96,165,212,0.08)',
           pointerEvents: 'none',
         }} />
       </div>
 
-      {/* Panel derecho — formulario */}
+      {/* Panel derecho */}
       <div style={{
         flex: 1,
         display: 'flex',
@@ -208,7 +202,6 @@ export default function SignIn() {
       }}>
         <div style={{ width: '100%', maxWidth: '400px' }}>
 
-          {/* Header */}
           <div style={{ marginBottom: '2rem' }}>
             <h1 style={{ fontSize: '1.75rem', fontWeight: '900', color: T.forest, margin: '0 0 6px', letterSpacing: '-0.02em' }}>
               Bienvenido de vuelta
@@ -218,7 +211,6 @@ export default function SignIn() {
             </p>
           </div>
 
-          {/* Error */}
           {error && (
             <div style={{
               backgroundColor: T.errorBg, border: `1px solid ${T.errorBorder}`,
@@ -229,7 +221,6 @@ export default function SignIn() {
             </div>
           )}
 
-          {/* Email */}
           <div style={{ marginBottom: '1rem' }}>
             <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '600', color: T.forest, marginBottom: '5px' }}>
               Correo electrónico
@@ -243,7 +234,6 @@ export default function SignIn() {
             />
           </div>
 
-          {/* Password */}
           <div style={{ marginBottom: '0.5rem' }}>
             <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '600', color: T.forest, marginBottom: '5px' }}>
               Contraseña
@@ -258,19 +248,16 @@ export default function SignIn() {
             />
           </div>
 
-          {/* Botón principal */}
           <button className="btn-submit" onClick={handleSubmit} disabled={loading}>
             {loading ? 'Ingresando...' : 'Iniciar sesión'}
           </button>
 
-          {/* Divisor */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '1.25rem 0' }}>
             <div style={{ flex: 1, height: '1px', backgroundColor: T.border }} />
             <span style={{ color: T.textMuted, fontSize: '0.8rem', fontWeight: '500' }}>o</span>
             <div style={{ flex: 1, height: '1px', backgroundColor: T.border }} />
           </div>
 
-          {/* Google */}
           <button className="btn-google" onClick={handleGoogleLogin}>
             <svg width="18" height="18" viewBox="0 0 18 18">
               <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
@@ -281,7 +268,6 @@ export default function SignIn() {
             Continuar con Google
           </button>
 
-          {/* Link registro */}
           <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.875rem', color: T.textMuted }}>
             ¿No tienes cuenta?{' '}
             <span className="link-text" onClick={() => navigate('/register')}>

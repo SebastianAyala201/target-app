@@ -13,15 +13,15 @@ const mdProps = {
 }
 
 const T = {
-  forest:    '#0f3d2e',
-  pine:      '#1a5c3a',
-  emerald:   '#16a34a',
-  mist:      '#f0faf4',
+  forest:    '#0f2a4a',
+  pine:      '#1a3f6b',
+  emerald:   '#2563a8',
+  mist:      '#e8f2fb',
   surface:   '#ffffff',
-  text:      '#0f1a14',
-  textMuted: '#4a6355',
-  border:    '#c8e6d4',
-  lime:      '#a3e635',
+  text:      '#0f1a2e',
+  textMuted: '#4a6580',
+  border:    '#cbd5e1',
+  accent:    '#60a5d4',
 }
 
 export default function Questions() {
@@ -133,12 +133,12 @@ export default function Questions() {
   }
 
   const pct = tiempoRestante !== null ? tiempoRestante / (tiempoTotal * 60) : 1
-  const timerColor = pct > 0.5 ? T.lime : pct > 0.25 ? '#fbbf24' : '#f87171'
+  const timerColor = pct > 0.5 ? T.accent : pct > 0.25 ? '#fbbf24' : '#f87171'
 
   const getColorOpcion = (letra) => {
     if (!respondida) return T.surface
     if (modoExamen) return seleccion === letra ? '#fefce8' : T.surface
-    if (letra === preguntaActual.respuesta_correcta) return '#f0fdf4'
+    if (letra === preguntaActual.respuesta_correcta) return '#eff6ff'
     if (letra === seleccion) return '#fef2f2'
     return T.surface
   }
@@ -195,7 +195,7 @@ export default function Questions() {
   if (configurando) return (
     <div style={{ minHeight: '100vh', backgroundColor: T.mist, fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif", display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap'); * { box-sizing: border-box; }`}</style>
-      <div style={{ backgroundColor: T.surface, borderRadius: '16px', padding: '2.5rem', maxWidth: '460px', width: '100%', border: `1px solid ${T.border}`, boxShadow: '0 8px 40px rgba(15,61,46,0.1)' }}>
+      <div style={{ backgroundColor: T.surface, borderRadius: '16px', padding: '2.5rem', maxWidth: '460px', width: '100%', border: `1px solid ${T.border}`, boxShadow: '0 8px 40px rgba(15,42,74,0.1)' }}>
 
         {/* Header config */}
         <div style={{ marginBottom: '2rem' }}>
@@ -291,10 +291,10 @@ export default function Questions() {
         .md-content p { margin: 0.4rem 0; }
         .md-content ul, .md-content ol { padding-left: 1.5rem; margin: 0.5rem 0; }
         .md-content table { border-collapse: collapse; width: 100%; margin: 0.75rem 0; font-size: 0.9rem; }
-        .md-content th, .md-content td { border: 1px solid #c8e6d4; padding: 7px 12px; text-align: left; }
-        .md-content th { background-color: #f0fdf4; font-weight: 700; color: #0f3d2e; }
-        .md-content strong { color: #0f3d2e; font-weight: 700; }
-        .md-content em { color: #4a6355; }
+        .md-content th, .md-content td { border: 1px solid #cbd5e1; padding: 7px 12px; text-align: left; }
+        .md-content th { background-color: #eff6ff; font-weight: 700; color: #0f2a4a; }
+        .md-content strong { color: #0f2a4a; font-weight: 700; }
+        .md-content em { color: #4a6580; }
 
         .opcion-btn {
           display: flex;
@@ -310,8 +310,8 @@ export default function Questions() {
           transition: border-color 0.15s, background 0.15s;
         }
         .opcion-btn:not([disabled]):hover {
-          border-color: #16a34a !important;
-          background-color: #f0fdf4 !important;
+          border-color: #2563a8 !important;
+          background-color: #eff6ff !important;
         }
 
         .nav-btn-q {
@@ -329,7 +329,7 @@ export default function Questions() {
         .nav-btn-q:hover { border-color: rgba(255,255,255,0.7); color: white; }
 
         .btn-primary-q {
-          background-color: #16a34a;
+          background-color: #2563a8;
           color: white;
           border: none;
           padding: 11px 28px;
@@ -340,12 +340,12 @@ export default function Questions() {
           font-family: inherit;
           transition: background 0.15s;
         }
-        .btn-primary-q:hover { background-color: #1a5c3a; }
+        .btn-primary-q:hover { background-color: #1a3f6b; }
 
         .btn-sec-q {
           background: transparent;
-          color: #4a6355;
-          border: 1.5px solid #c8e6d4;
+          color: #4a6580;
+          border: 1.5px solid #cbd5e1;
           padding: 11px 24px;
           border-radius: 8px;
           font-size: 0.9rem;
@@ -353,7 +353,7 @@ export default function Questions() {
           font-family: inherit;
           transition: border-color 0.15s, color 0.15s;
         }
-        .btn-sec-q:hover { border-color: #16a34a; color: #0f3d2e; }
+        .btn-sec-q:hover { border-color: #2563a8; color: #0f2a4a; }
 
         @keyframes spin { to { transform: rotate(360deg); } }
       `}</style>
@@ -399,8 +399,8 @@ export default function Questions() {
       </nav>
 
       {/* Barra de progreso */}
-      <div style={{ height: '3px', backgroundColor: 'rgba(15,61,46,0.1)' }}>
-        <div style={{ height: '100%', width: `${progresoPct}%`, backgroundColor: T.lime, transition: 'width 0.3s ease' }} />
+      <div style={{ height: '3px', backgroundColor: 'rgba(15,42,74,0.1)' }}>
+        <div style={{ height: '100%', width: `${progresoPct}%`, backgroundColor: T.accent, transition: 'width 0.3s ease' }} />
       </div>
 
       <div className="no-select" style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem 1.5rem' }}>
@@ -413,7 +413,7 @@ export default function Questions() {
           <>
             {/* Tags */}
             <div style={{ display: 'flex', gap: '6px', marginBottom: '1rem', flexWrap: 'wrap' }}>
-              <span style={{ backgroundColor: '#dcfce7', color: T.pine, fontSize: '0.7rem', fontWeight: '700', padding: '3px 10px', borderRadius: '999px', letterSpacing: '0.04em', border: '1px solid #bbf7d0' }}>
+              <span style={{ backgroundColor: '#dbeafe', color: T.pine, fontSize: '0.7rem', fontWeight: '700', padding: '3px 10px', borderRadius: '999px', letterSpacing: '0.04em', border: '1px solid #bfdbfe' }}>
                 {preguntaActual.enfoque?.toUpperCase()}
               </span>
               <span style={{ backgroundColor: T.surface, color: T.textMuted, fontSize: '0.7rem', fontWeight: '600', padding: '3px 10px', borderRadius: '999px', border: `1px solid ${T.border}` }}>
@@ -427,7 +427,7 @@ export default function Questions() {
             </div>
 
             {/* Card pregunta */}
-            <div style={{ backgroundColor: T.surface, borderRadius: '14px', padding: '1.75rem 2rem', border: `1px solid ${T.border}`, boxShadow: '0 2px 16px rgba(15,61,46,0.07)', marginBottom: '1rem' }}>
+            <div style={{ backgroundColor: T.surface, borderRadius: '14px', padding: '1.75rem 2rem', border: `1px solid ${T.border}`, boxShadow: '0 2px 16px rgba(15,42,74,0.07)', marginBottom: '1rem' }}>
 
               {/* Enunciado */}
               <div className="md-content" style={{ fontSize: '1rem', lineHeight: '1.8', color: T.text, marginBottom: '1.5rem' }}>
@@ -480,13 +480,13 @@ export default function Questions() {
 
             {/* Card explicación */}
             {respondida && !modoExamen && (
-              <div style={{ backgroundColor: T.surface, borderRadius: '14px', padding: '1.75rem 2rem', border: `1px solid ${T.border}`, borderLeft: `4px solid ${seleccion === preguntaActual.respuesta_correcta ? T.emerald : '#dc2626'}`, boxShadow: '0 2px 16px rgba(15,61,46,0.07)', marginBottom: '1rem' }}>
+              <div style={{ backgroundColor: T.surface, borderRadius: '14px', padding: '1.75rem 2rem', border: `1px solid ${T.border}`, borderLeft: `4px solid ${seleccion === preguntaActual.respuesta_correcta ? T.emerald : '#dc2626'}`, boxShadow: '0 2px 16px rgba(15,42,74,0.07)', marginBottom: '1rem' }}>
 
                 {/* Resultado */}
                 <div style={{ marginBottom: '1.25rem', paddingBottom: '1.25rem', borderBottom: `1px solid ${T.border}` }}>
                   {seleccion === preguntaActual.respuesta_correcta ? (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                           <path d="M2.5 7l3 3 6-6" stroke={T.emerald} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
@@ -532,7 +532,7 @@ export default function Questions() {
                 )}
 
                 {preguntaActual.objetivo_educativo && (
-                  <div style={{ backgroundColor: '#f0fdf4', border: `1px solid ${T.border}`, borderRadius: '10px', padding: '1rem 1.25rem', marginTop: '1.25rem' }}>
+                  <div style={{ backgroundColor: '#eff6ff', border: `1px solid ${T.border}`, borderRadius: '10px', padding: '1rem 1.25rem', marginTop: '1.25rem' }}>
                     <h3 style={{ color: T.forest, fontSize: '0.82rem', fontWeight: '700', margin: '0 0 0.5rem', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
                       Objetivo educativo
                     </h3>
