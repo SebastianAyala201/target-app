@@ -3,17 +3,17 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
 const T = {
-  forest:      '#0f2a4a',
-  pine:        '#1a3f6b',
-  emerald:     '#2563a8',
-  mist:        '#e8f2fb',
-  surface:     '#ffffff',
-  text:        '#0f1a2e',
-  textMuted:   '#4a6580',
-  border:      '#cbd5e1',
-  lime:        '#60a5d4',
-  error:       '#dc2626',
-  errorBg:     '#fef2f2',
+  forest: '#0f2a4a',
+  pine: '#1a3f6b',
+  emerald: '#2563a8',
+  mist: '#e8f2fb',
+  surface: '#ffffff',
+  text: '#0f1a2e',
+  textMuted: '#4a6580',
+  border: '#cbd5e1',
+  lime: '#60a5d4',
+  error: '#dc2626',
+  errorBg: '#fef2f2',
   errorBorder: '#fca5a5',
 }
 
@@ -29,9 +29,11 @@ export default function Register() {
   })
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target
-    setForm({ ...form, [name]: type === 'checkbox' ? checked : value })
-  }
+    console.log('handleChange called with', e.target.name, e.target.value);
+    const { name, value, type, checked } = e.target;
+    setForm({ ...form, [name]: type === 'checkbox' ? checked : value });
+    console.log('Form state after change:', form);
+  };
 
   const handleSubmit = async () => {
     setError('')
@@ -85,12 +87,24 @@ export default function Register() {
       <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: T.forest, marginBottom: '4px' }}>
         {label}
       </label>
+      {/*
       <input
         name={name} type={type} placeholder={placeholder}
         onChange={handleChange}
         onFocus={() => setFocused(name)}
         onBlur={() => setFocused('')}
         style={inputStyle(name)}
+      />
+      */}
+      <input
+        name={name} type={type} placeholder={placeholder}
+        onChange={handleChange}
+        onFocus={() => setFocused(name)}
+        onBlur={() => setFocused('')}
+        style={{
+          width: '100%', padding: '10px', fontSize: '16px',
+          border: '1px solid #ccc', borderRadius: '4px'
+        }}
       />
     </div>
   )
@@ -228,24 +242,112 @@ export default function Register() {
           )}
 
           <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
-            <div style={{ flex: 1 }}><Field label="Nombre *" name="nombre" placeholder="Juan" /></div>
-            <div style={{ flex: 1 }}><Field label="Apellido paterno *" name="apellidoPaterno" placeholder="Pérez" /></div>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: T.forest, marginBottom: '4px' }}>
+                Nombre *
+              </label>
+              <input
+                name="nombre" type="text" placeholder="Juan"
+                onChange={handleChange}
+                onFocus={() => setFocused('nombre')}
+                // onBlur={() => setFocused('')}
+                style={{
+                  width: '100%', padding: '10px', fontSize: '16px',
+                  border: '1px solid #ccc', borderRadius: '4px'
+                }}
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: T.forest, marginBottom: '4px' }}>
+                Apellido paterno *
+              </label>
+              <input
+                name="apellidoPaterno" type="text" placeholder="Pérez"
+                onChange={handleChange}
+                onFocus={() => setFocused('apellidoPaterno')}
+                // onBlur={() => setFocused('')}
+                style={{
+                  width: '100%', padding: '10px', fontSize: '16px',
+                  border: '1px solid #ccc', borderRadius: '4px'
+                }}
+              />
+            </div>
           </div>
 
           <div style={{ marginBottom: '10px' }}>
-            <Field label="Apellido materno" name="apellidoMaterno" placeholder="García (opcional)" />
+            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: T.forest, marginBottom: '4px' }}>
+              Apellido materno
+            </label>
+            <input
+              name="apellidoMaterno" type="text" placeholder="García (opcional)"
+              onChange={handleChange}
+              onFocus={() => setFocused('apellidoMaterno')}
+              // onBlur={() => setFocused('')}
+              style={{
+                width: '100%', padding: '10px', fontSize: '16px',
+                border: '1px solid #ccc', borderRadius: '4px'
+              }}
+            />
           </div>
           <div style={{ marginBottom: '10px' }}>
-            <Field label="Nombre de usuario *" name="username" placeholder="juanperez123" />
+            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: T.forest, marginBottom: '4px' }}>
+              Nombre de usuario *
+            </label>
+            <input
+              name="username" type="text" placeholder="juanperez123"
+              onChange={handleChange}
+              onFocus={() => setFocused('username')}
+              // onBlur={() => setFocused('')}
+              style={{
+                width: '100%', padding: '10px', fontSize: '16px',
+                border: '1px solid #ccc', borderRadius: '4px'
+              }}
+            />
           </div>
           <div style={{ marginBottom: '10px' }}>
-            <Field label="Correo electrónico *" name="email" type="email" placeholder="juan@email.com" />
+            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: T.forest, marginBottom: '4px' }}>
+              Correo electrónico *
+            </label>
+            <input
+              name="email" type="email" placeholder="juan@email.com"
+              onChange={handleChange}
+              onFocus={() => setFocused('email')}
+              // onBlur={() => setFocused('')}
+              style={{
+                width: '100%', padding: '10px', fontSize: '16px',
+                border: '1px solid #ccc', borderRadius: '4px'
+              }}
+            />
           </div>
           <div style={{ marginBottom: '10px' }}>
-            <Field label="Contraseña *" name="password" type="password" placeholder="Mínimo 8 caracteres" />
+            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: T.forest, marginBottom: '4px' }}>
+              Contraseña *
+            </label>
+            <input
+              name="password" type="password" placeholder="Mínimo 8 caracteres"
+              onChange={handleChange}
+              onFocus={() => setFocused('password')}
+              // onBlur={() => setFocused('')}
+              style={{
+                width: '100%', padding: '10px', fontSize: '16px',
+                border: '1px solid #ccc', borderRadius: '4px'
+              }}
+            />
           </div>
           <div style={{ marginBottom: '1.25rem' }}>
-            <Field label="Confirmar contraseña *" name="confirmPassword" type="password" placeholder="Repite tu contraseña" />
+            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: T.forest, marginBottom: '4px' }}>
+              Confirmar contraseña *
+            </label>
+            <input
+              name="confirmPassword" type="password" placeholder="Repite tu contraseña"
+              onChange={handleChange}
+              onFocus={() => setFocused('confirmPassword')}
+              // onBlur={() => setFocused('')}
+              style={{
+                width: '100%', padding: '10px', fontSize: '16px',
+                border: '1px solid #ccc', borderRadius: '4px'
+              }}
+            />
           </div>
 
           <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer', marginBottom: '1.5rem' }}>
