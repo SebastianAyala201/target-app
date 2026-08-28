@@ -14,12 +14,12 @@ const T = {
 }
 
 const areas = [
-  { id: 'fisiologia',       nombre: 'Fisiología',       imagen: '/topicos/fisiologia.jpg',       preguntas: '+23',    disponible: true  },
-  { id: 'fisiopatologia',   nombre: 'Fisiopatología',   imagen: '/topicos/fisiopatologia.jpg',   preguntas: '+40',    disponible: true  },
-  { id: 'anatomia',         nombre: 'Anatomía',         imagen: '/topicos/anatomia.jpg',         preguntas: '+10',    disponible: true  },
-  { id: 'histologia',       nombre: 'Histología',       imagen: '/topicos/histologia.jpg',       preguntas: '+26',    disponible: true  },
-  { id: 'embriologia',      nombre: 'Embriología',      imagen: '/topicos/embriologia.jpg',      preguntas: '+31',    disponible: true  },
-  { id: 'medicina_interna', nombre: 'Medicina Interna', imagen: '/topicos/medicina_interna.jpg', preguntas: '+200', disponible: true  },
+  { id: 'fisiologia',       nombre: 'Fisiología',       imagen: '/topicos/fisiologia.jpg',       preguntas: 41,     disponible: true  },
+  { id: 'fisiopatologia',   nombre: 'Fisiopatología',   imagen: '/topicos/fisiopatologia.jpg',   preguntas: 117,    disponible: true  },
+  { id: 'anatomia',         nombre: 'Anatomía',         imagen: '/topicos/anatomia.jpg',         preguntas: 36,     disponible: true  },
+  { id: 'histologia',       nombre: 'Histología',       imagen: '/topicos/histologia.jpg',       preguntas: 26,     disponible: true  },
+  { id: 'embriologia',      nombre: 'Embriología',      imagen: '/topicos/embriologia.jpg',      preguntas: 31,     disponible: true  },
+  { id: 'medicina_interna', nombre: 'Medicina Interna', imagen: '/topicos/medicina_interna.jpg', preguntas: 256,    disponible: true  },
 ]
 
 export default function Areas() {

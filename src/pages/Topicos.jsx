@@ -17,48 +17,48 @@ const topicos = {
     nombre: 'Fisiología',
     descripcion: 'Mecanismos fundamentales del funcionamiento del cuerpo humano.',
     topicos: [
-      { id: 'fisiologia_celular',  nombre: 'Fisiología Celular',  imagen: '/topicos/fisiologia_celular.jpg',  preguntas: '19',    disponible: true  },
-      { id: 'fisiologia_nerviosa', nombre: 'Fisiología Nerviosa', imagen: '/topicos/fisiologia_nerviosa.jpg', preguntas: 'Pronto', disponible: true },
-      { id: 'fisiologia_renal',    nombre: 'Fisiología Renal',    imagen: '/topicos/fisiologia_renal.jpg',    preguntas: '4',     disponible: true  },
+      { id: 'fisiologia_celular',  nombre: 'Fisiología Celular',  imagen: '/topicos/fisiologia_celular.jpg',  preguntas: 19,     disponible: true  },
+      { id: 'fisiologia_nerviosa', nombre: 'Fisiología Nerviosa', imagen: '/topicos/fisiologia_nerviosa.jpg', preguntas: 0,      disponible: false },
+      { id: 'fisiologia_renal',    nombre: 'Fisiología Renal',    imagen: '/topicos/fisiologia_renal.jpg',    preguntas: 22,     disponible: true  },
     ]
   },
   fisiopatologia: {
     nombre: 'Fisiopatología',
     descripcion: 'Alteraciones de los mecanismos fisiológicos en la enfermedad.',
     topicos: [
-      { id: 'reumatologia',      nombre: 'Reumatología',      imagen: '/topicos/reumatologia.jpg',      preguntas: 'Pronto', disponible: true },
-      { id: 'nefrologia',        nombre: 'Nefrología',        imagen: '/topicos/nefrologia.jpg',        preguntas: 'Pronto', disponible: true },
-      { id: 'gastroenterologia', nombre: 'Gastroenterología', imagen: '/topicos/gastroenterologia.jpg', preguntas: 'Pronto', disponible: true },
+      { id: 'reumatologia',      nombre: 'Reumatología',      imagen: '/topicos/reumatologia.jpg',      preguntas: 47,     disponible: true },
+      { id: 'nefrologia',        nombre: 'Nefrología',        imagen: '/topicos/nefrologia.jpg',        preguntas: 23,     disponible: true },
+      { id: 'gastroenterologia', nombre: 'Gastroenterología', imagen: '/topicos/gastroenterologia.jpg', preguntas: 47,     disponible: true },
     ]
   },
   anatomia: {
     nombre: 'Anatomía',
     descripcion: 'Estructura y organización del cuerpo humano.',
     topicos: [
-      { id: 'anatomia_cardiovascular', nombre: 'Cardiovascular', imagen: '/topicos/anatomia_cardiovascular.jpg', preguntas: '10', disponible: true },
+      { id: 'anatomia_cardiovascular', nombre: 'Cardiovascular', imagen: '/topicos/anatomia_cardiovascular.jpg', preguntas: 36,  disponible: true },
     ]
   },
   histologia: {
     nombre: 'Histología',
     descripcion: 'Estudio microscópico de los tejidos del organismo.',
     topicos: [
-      { id: 'histologia_cardiovascular', nombre: 'Cardiovascular', imagen: '/topicos/histologia_cardiovascular.jpg', preguntas: '26', disponible: true },
+      { id: 'histologia_cardiovascular', nombre: 'Cardiovascular', imagen: '/topicos/histologia_cardiovascular.jpg', preguntas: 26,  disponible: true },
     ]
   },
   embriologia: {
     nombre: 'Embriología',
     descripcion: 'Desarrollo y formación de los órganos durante la gestación.',
     topicos: [
-      { id: 'embriologia_cardiovascular', nombre: 'Cardiovascular', imagen: '/topicos/embriologia_cardiovascular.jpg', preguntas: '30', disponible: true },
-      { id: 'embriologia_renal',          nombre: 'Renal',          imagen: '/topicos/embriologia_renal.jpg',          preguntas: '1',  disponible: true },
+      { id: 'embriologia_cardiovascular', nombre: 'Cardiovascular', imagen: '/topicos/embriologia_cardiovascular.jpg', preguntas: 30,  disponible: true },
+      { id: 'embriologia_renal',          nombre: 'Renal',          imagen: '/topicos/embriologia_renal.jpg',          preguntas: 1,   disponible: false },
     ]
   },
   medicina_interna: {
     nombre: 'Medicina Interna',
     descripcion: 'Diagnóstico y tratamiento de enfermedades del adulto.',
     topicos: [
-      { id: 'hematologia', nombre: 'Hematología', imagen: '/topicos/hematologia.jpg', preguntas: 'Disponible', disponible: true  },
-      { id: 'neurologia',  nombre: 'Neurología',  imagen: '/topicos/neurologia.jpg',  preguntas: 'Disponible', disponible: true },
+      { id: 'hematologia', nombre: 'Hematología', imagen: '/topicos/hematologia.jpg', preguntas: 185,    disponible: true  },
+      { id: 'neurologia',  nombre: 'Neurología',  imagen: '/topicos/neurologia.jpg',  preguntas: 71,     disponible: true },
     ]
   },
 }
