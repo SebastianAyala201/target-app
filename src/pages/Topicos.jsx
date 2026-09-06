@@ -1,6 +1,4 @@
-import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { supabase } from '../lib/supabase'
 
 const T = {
   forest:    '#0f2a4a',
@@ -19,10 +17,9 @@ const topicos = {
     nombre: 'Fisiología',
     descripcion: 'Mecanismos fundamentales del funcionamiento del cuerpo humano.',
     topicos: [
-      { id: 'fisiologia_celular',   nombre: 'Fisiología Celular',   imagen: '/topicos/fisiologia_celular.jpg',   preguntas: 19,     disponible: true  },
-      { id: 'fisiologia_digestiva', nombre: 'Fisiología Digestiva', imagen: '/topicos/fisiologia_digestiva.jpg', preguntas: 36,     disponible: true  },
-      { id: 'fisiologia_endocrina', nombre: 'Fisiología Endocrina', imagen: '/topicos/fisiologia_endocrina.jpg', preguntas: 1,      disponible: false },
-      { id: 'fisiologia_renal',     nombre: 'Fisiología Renal',     imagen: '/topicos/fisiologia_renal.jpg',     preguntas: 80,     disponible: true  },
+      { id: 'fisiologia_celular',  nombre: 'Fisiología Celular',  imagen: '/topicos/fisiologia_celular.jpg',  preguntas: 19,     disponible: true  },
+      { id: 'fisiologia_nerviosa', nombre: 'Fisiología Nerviosa', imagen: '/topicos/fisiologia_nerviosa.jpg', preguntas: 0,      disponible: false },
+      { id: 'fisiologia_renal',    nombre: 'Fisiología Renal',    imagen: '/topicos/fisiologia_renal.jpg',    preguntas: 22,     disponible: true  },
     ]
   },
   fisiopatologia: {
@@ -70,25 +67,6 @@ export default function Topicos() {
   const { area } = useParams()
   const navigate = useNavigate()
   const areaData = topicos[area]
-  const [topicosData, setTopicosData] = useState([])
-
-  useEffect(() => {
-    async function fetchData() {
-      let { data, error } = await supabase
-        .from('preguntas')
-        .select('topico, count(*)')
-        .eq('area', area)
-        .groupBy('topico')
-
-      if (error) {
-        console.error('Error fetching topicos data:', error)
-      } else {
-        setTopicosData(data)
-      }
-    }
-
-    fetchData()
-  }, [area])
 
   if (!areaData) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: T.mist }}>
@@ -101,7 +79,7 @@ export default function Topicos() {
     navigate(`/preguntas/${top.id}`)
   }
 
-  const disponibles = topicosData.filter(t => t.count >= 10).length
+  const disponibles = areaData.topicos.filter(t => t.disponible).length
 
   return (
     <div style={{
@@ -214,62 +192,56 @@ export default function Topicos() {
           gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
           gap: '1.25rem',
         }}>
-          {areaData.topicos.map((top) => {
-            const topicoData = topicosData.find(data => data.topico === top.id)
-            const preguntasCount = topicoData ? topicoData.count : 0
-            const disponible = preguntasCount >= 10
-
-            return (
-              <div
-                key={top.id}
-                className={`topico-card${!disponible ? ' disabled' : ''}`}
-                onClick={() => handleTopico({...top, disponible})}
-              >
-                <div style={{ height: '150px', backgroundColor: '#dbeafe', position: 'relative', overflow: 'hidden' }}>
-                  <img
-                    src={top.imagen}
-                    alt={top.nombre}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                    onError={e => { e.target.style.display = 'none' }}
-                  />
-                  <div style={{
-                    position: 'absolute', top: '10px', right: '10px',
-                    backgroundColor: disponible ? T.forest : '#6b7280',
-                    color: disponible ? T.lime : 'white',
-                    fontSize: '0.7rem', fontWeight: '800',
-                    padding: '3px 10px', borderRadius: '999px',
-                    letterSpacing: '0.03em',
-                  }}>
-                    {preguntasCount} preguntas
-                  </div>
-                </div>
-
-                <div style={{ padding: '1.1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <h3 style={{ color: T.forest, fontSize: '1rem', fontWeight: '700', margin: '0 0 3px', letterSpacing: '-0.01em' }}>
-                      {top.nombre}
-                    </h3>
-                    {disponible
-                      ? <span style={{ fontSize: '0.75rem', color: T.emerald, fontWeight: '600' }}>Disponible</span>
-                      : <span style={{ fontSize: '0.75rem', color: '#9ca3af', fontWeight: '500' }}>Próximamente</span>
-                    }
-                  </div>
-                  {disponible && (
-                    <div style={{
-                      width: '32px', height: '32px', borderRadius: '50%',
-                      backgroundColor: '#dbeafe', border: `1.5px solid ${T.border}`,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      flexShrink: 0,
-                    }}>
-                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                        <path d="M2 6h8M7 3l3 3-3 3" stroke={T.emerald} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    </div>
-                  )}
+          {areaData.topicos.map((top) => (
+            <div
+              key={top.id}
+              className={`topico-card${!top.disponible ? ' disabled' : ''}`}
+              onClick={() => handleTopico(top)}
+            >
+              <div style={{ height: '150px', backgroundColor: '#dbeafe', position: 'relative', overflow: 'hidden' }}>
+                <img
+                  src={top.imagen}
+                  alt={top.nombre}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  onError={e => { e.target.style.display = 'none' }}
+                />
+                <div style={{
+                  position: 'absolute', top: '10px', right: '10px',
+                  backgroundColor: top.disponible ? T.forest : '#6b7280',
+                  color: top.disponible ? T.lime : 'white',
+                  fontSize: '0.7rem', fontWeight: '800',
+                  padding: '3px 10px', borderRadius: '999px',
+                  letterSpacing: '0.03em',
+                }}>
+                  {top.preguntas}{top.disponible && top.preguntas !== 'Pronto' ? ' preguntas' : ''}
                 </div>
               </div>
-            )
-          })}
+
+              <div style={{ padding: '1.1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <h3 style={{ color: T.forest, fontSize: '1rem', fontWeight: '700', margin: '0 0 3px', letterSpacing: '-0.01em' }}>
+                    {top.nombre}
+                  </h3>
+                  {top.disponible
+                    ? <span style={{ fontSize: '0.75rem', color: T.emerald, fontWeight: '600' }}>Disponible</span>
+                    : <span style={{ fontSize: '0.75rem', color: '#9ca3af', fontWeight: '500' }}>Próximamente</span>
+                  }
+                </div>
+                {top.disponible && (
+                  <div style={{
+                    width: '32px', height: '32px', borderRadius: '50%',
+                    backgroundColor: '#dbeafe', border: `1.5px solid ${T.border}`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    flexShrink: 0,
+                  }}>
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path d="M2 6h8M7 3l3 3-3 3" stroke={T.emerald} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
 
       </div>

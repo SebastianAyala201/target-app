@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
@@ -15,34 +14,16 @@ const T = {
 }
 
 const areas = [
-  { id: 'fisiologia',       nombre: 'Fisiología',       imagen: '/topicos/fisiologia.jpg',       preguntas: 0,     disponible: true  },
-  { id: 'fisiopatologia',   nombre: 'Fisiopatología',   imagen: '/topicos/fisiopatologia.jpg',   preguntas: 0,    disponible: true  },
-  { id: 'anatomia',         nombre: 'Anatomía',         imagen: '/topicos/anatomia.jpg',         preguntas: 0,     disponible: true  },
-  { id: 'histologia',       nombre: 'Histología',       imagen: '/topicos/histologia.jpg',       preguntas: 0,     disponible: true  },
-  { id: 'embriologia',      nombre: 'Embriología',      imagen: '/topicos/embriologia.jpg',      preguntas: 0,     disponible: true  },
-  { id: 'medicina_interna', nombre: 'Medicina Interna', imagen: '/topicos/medicina_interna.jpg', preguntas: 0,    disponible: true  },
+  { id: 'fisiologia',       nombre: 'Fisiología',       imagen: '/topicos/fisiologia.jpg',       preguntas: 41,     disponible: true  },
+  { id: 'fisiopatologia',   nombre: 'Fisiopatología',   imagen: '/topicos/fisiopatologia.jpg',   preguntas: 117,    disponible: true  },
+  { id: 'anatomia',         nombre: 'Anatomía',         imagen: '/topicos/anatomia.jpg',         preguntas: 36,     disponible: true  },
+  { id: 'histologia',       nombre: 'Histología',       imagen: '/topicos/histologia.jpg',       preguntas: 26,     disponible: true  },
+  { id: 'embriologia',      nombre: 'Embriología',      imagen: '/topicos/embriologia.jpg',      preguntas: 31,     disponible: true  },
+  { id: 'medicina_interna', nombre: 'Medicina Interna', imagen: '/topicos/medicina_interna.jpg', preguntas: 256,    disponible: true  },
 ]
 
 export default function Areas() {
   const navigate = useNavigate()
-  const [areasData, setAreasData] = useState([])
-
-  useEffect(() => {
-    async function fetchData() {
-      let { data, error } = await supabase
-        .from('preguntas')
-        .select('area, count(*)')
-        .groupBy('area')
-
-      if (error) {
-        console.error('Error fetching areas data:', error)
-      } else {
-        setAreasData(data)
-      }
-    }
-
-    fetchData()
-  }, [])
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -144,62 +125,56 @@ export default function Areas() {
           gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
           gap: '1.25rem',
         }}>
-          {areas.map((area) => {
-            const areaData = areasData.find(data => data.area === area.id)
-            const preguntasCount = areaData ? areaData.count : 0
-            const disponible = preguntasCount >= 10
-
-            return (
-              <div
-                key={area.id}
-                className={`area-card${!disponible ? ' disabled' : ''}`}
-                onClick={() => handleArea({...area, disponible})}
-              >
-                <div style={{ height: '150px', backgroundColor: '#dbeafe', position: 'relative', overflow: 'hidden' }}>
-                  <img
-                    src={area.imagen}
-                    alt={area.nombre}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                    onError={e => { e.target.style.display = 'none' }}
-                  />
-                  <div style={{
-                    position: 'absolute', top: '10px', right: '10px',
-                    backgroundColor: disponible ? T.forest : '#6b7280',
-                    color: disponible ? T.lime : 'white',
-                    fontSize: '0.7rem', fontWeight: '800',
-                    padding: '3px 10px', borderRadius: '999px',
-                    letterSpacing: '0.03em',
-                  }}>
-                    {preguntasCount} preguntas
-                  </div>
-                </div>
-
-                <div style={{ padding: '1.1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <h3 style={{ color: T.forest, fontSize: '1rem', fontWeight: '700', margin: '0 0 3px', letterSpacing: '-0.01em' }}>
-                      {area.nombre}
-                    </h3>
-                    {disponible
-                      ? <span style={{ fontSize: '0.75rem', color: T.emerald, fontWeight: '600' }}>Disponible</span>
-                      : <span style={{ fontSize: '0.75rem', color: '#9ca3af', fontWeight: '500' }}>Próximamente</span>
-                    }
-                  </div>
-                  {disponible && (
-                    <div style={{
-                      width: '32px', height: '32px', borderRadius: '50%',
-                      backgroundColor: '#dbeafe', border: `1.5px solid ${T.border}`,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      flexShrink: 0,
-                    }}>
-                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                        <path d="M2 6h8M7 3l3 3-3 3" stroke={T.emerald} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    </div>
-                  )}
+          {areas.map((area) => (
+            <div
+              key={area.id}
+              className={`area-card${!area.disponible ? ' disabled' : ''}`}
+              onClick={() => handleArea(area)}
+            >
+              <div style={{ height: '150px', backgroundColor: '#dbeafe', position: 'relative', overflow: 'hidden' }}>
+                <img
+                  src={area.imagen}
+                  alt={area.nombre}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  onError={e => { e.target.style.display = 'none' }}
+                />
+                <div style={{
+                  position: 'absolute', top: '10px', right: '10px',
+                  backgroundColor: area.disponible ? T.forest : '#6b7280',
+                  color: area.disponible ? T.lime : 'white',
+                  fontSize: '0.7rem', fontWeight: '800',
+                  padding: '3px 10px', borderRadius: '999px',
+                  letterSpacing: '0.03em',
+                }}>
+                  {area.preguntas} preguntas
                 </div>
               </div>
-            )
-          })}
+
+              <div style={{ padding: '1.1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <h3 style={{ color: T.forest, fontSize: '1rem', fontWeight: '700', margin: '0 0 3px', letterSpacing: '-0.01em' }}>
+                    {area.nombre}
+                  </h3>
+                  {area.disponible
+                    ? <span style={{ fontSize: '0.75rem', color: T.emerald, fontWeight: '600' }}>Disponible</span>
+                    : <span style={{ fontSize: '0.75rem', color: '#9ca3af', fontWeight: '500' }}>Próximamente</span>
+                  }
+                </div>
+                {area.disponible && (
+                  <div style={{
+                    width: '32px', height: '32px', borderRadius: '50%',
+                    backgroundColor: '#dbeafe', border: `1.5px solid ${T.border}`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    flexShrink: 0,
+                  }}>
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path d="M2 6h8M7 3l3 3-3 3" stroke={T.emerald} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
 
       </div>
