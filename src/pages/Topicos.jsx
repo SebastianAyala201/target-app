@@ -26,8 +26,11 @@ const topicosMeta = {
     descripcion: 'Mecanismos fundamentales del funcionamiento del cuerpo humano.',
     topicos: [
       { id: 'fisiologia_celular',  nombre: 'Fisiología Celular',  imagen: '/topicos/fisiologia_celular.jpg' },
-      { id: 'fisiologia_nerviosa', nombre: 'Fisiología Nerviosa', imagen: '/topicos/fisiologia_nerviosa.jpg' },
       { id: 'fisiologia_renal',    nombre: 'Fisiología Renal',    imagen: '/topicos/fisiologia_renal.jpg' },
+      { id: 'fisiologia_digestiva',    nombre: 'Fisiología Digestiva',    imagen: '/topicos/fisiologia_digestiva.jpg' },
+      { id: 'fisiologia_endocrina',    nombre: 'Fisiología Endocrina',    imagen: '/topicos/fisiologia_endocrina.jpg' },
+      { id: 'fisiologia_cardiovascular',    nombre: 'Fisiología Cardiovascular',    imagen: '/topicos/fisiologia_cardiovascular.jpg' },
+      { id: 'fisiologia_respiratoria',    nombre: 'Fisiología Respiratoria',    imagen: '/topicos/fisiologia_respiratoria.jpg' },
     ]
   },
   fisiopatologia: {
