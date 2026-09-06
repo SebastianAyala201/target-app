@@ -1,4 +1,6 @@
+import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { supabase } from '../lib/supabase'
 
 const T = {
   forest:    '#0f2a4a',
@@ -12,53 +14,59 @@ const T = {
   lime:      '#60a5d4',
 }
 
-const topicos = {
+// Mismo umbral que Areas.jsx — si lo cambias aquí, cámbialo también allá
+// para que sea consistente en toda la app.
+const UMBRAL_DISPONIBLE = 20
+
+// Metadata estática de cada tópico (nombre, descripción, imagen).
+// El conteo de preguntas y el flag "disponible" se calculan en vivo desde Supabase.
+const topicosMeta = {
   fisiologia: {
     nombre: 'Fisiología',
     descripcion: 'Mecanismos fundamentales del funcionamiento del cuerpo humano.',
     topicos: [
-      { id: 'fisiologia_celular',  nombre: 'Fisiología Celular',  imagen: '/topicos/fisiologia_celular.jpg',  preguntas: 19,     disponible: true  },
-      { id: 'fisiologia_nerviosa', nombre: 'Fisiología Nerviosa', imagen: '/topicos/fisiologia_nerviosa.jpg', preguntas: 0,      disponible: false },
-      { id: 'fisiologia_renal',    nombre: 'Fisiología Renal',    imagen: '/topicos/fisiologia_renal.jpg',    preguntas: 22,     disponible: true  },
+      { id: 'fisiologia_celular',  nombre: 'Fisiología Celular',  imagen: '/topicos/fisiologia_celular.jpg' },
+      { id: 'fisiologia_nerviosa', nombre: 'Fisiología Nerviosa', imagen: '/topicos/fisiologia_nerviosa.jpg' },
+      { id: 'fisiologia_renal',    nombre: 'Fisiología Renal',    imagen: '/topicos/fisiologia_renal.jpg' },
     ]
   },
   fisiopatologia: {
     nombre: 'Fisiopatología',
     descripcion: 'Alteraciones de los mecanismos fisiológicos en la enfermedad.',
     topicos: [
-      { id: 'reumatologia',      nombre: 'Reumatología',      imagen: '/topicos/reumatologia.jpg',      preguntas: 47,     disponible: true },
-      { id: 'nefrologia',        nombre: 'Nefrología',        imagen: '/topicos/nefrologia.jpg',        preguntas: 23,     disponible: true },
-      { id: 'gastroenterologia', nombre: 'Gastroenterología', imagen: '/topicos/gastroenterologia.jpg', preguntas: 47,     disponible: true },
+      { id: 'reumatologia',      nombre: 'Reumatología',      imagen: '/topicos/reumatologia.jpg' },
+      { id: 'nefrologia',        nombre: 'Nefrología',        imagen: '/topicos/nefrologia.jpg' },
+      { id: 'gastroenterologia', nombre: 'Gastroenterología', imagen: '/topicos/gastroenterologia.jpg' },
     ]
   },
   anatomia: {
     nombre: 'Anatomía',
     descripcion: 'Estructura y organización del cuerpo humano.',
     topicos: [
-      { id: 'anatomia_cardiovascular', nombre: 'Cardiovascular', imagen: '/topicos/anatomia_cardiovascular.jpg', preguntas: 36,  disponible: true },
+      { id: 'anatomia_cardiovascular', nombre: 'Cardiovascular', imagen: '/topicos/anatomia_cardiovascular.jpg' },
     ]
   },
   histologia: {
     nombre: 'Histología',
     descripcion: 'Estudio microscópico de los tejidos del organismo.',
     topicos: [
-      { id: 'histologia_cardiovascular', nombre: 'Cardiovascular', imagen: '/topicos/histologia_cardiovascular.jpg', preguntas: 26,  disponible: true },
+      { id: 'histologia_cardiovascular', nombre: 'Cardiovascular', imagen: '/topicos/histologia_cardiovascular.jpg' },
     ]
   },
   embriologia: {
     nombre: 'Embriología',
     descripcion: 'Desarrollo y formación de los órganos durante la gestación.',
     topicos: [
-      { id: 'embriologia_cardiovascular', nombre: 'Cardiovascular', imagen: '/topicos/embriologia_cardiovascular.jpg', preguntas: 30,  disponible: true },
-      { id: 'embriologia_renal',          nombre: 'Renal',          imagen: '/topicos/embriologia_renal.jpg',          preguntas: 1,   disponible: false },
+      { id: 'embriologia_cardiovascular', nombre: 'Cardiovascular', imagen: '/topicos/embriologia_cardiovascular.jpg' },
+      { id: 'embriologia_renal',          nombre: 'Renal',          imagen: '/topicos/embriologia_renal.jpg' },
     ]
   },
   medicina_interna: {
     nombre: 'Medicina Interna',
     descripcion: 'Diagnóstico y tratamiento de enfermedades del adulto.',
     topicos: [
-      { id: 'hematologia', nombre: 'Hematología', imagen: '/topicos/hematologia.jpg', preguntas: 185,    disponible: true  },
-      { id: 'neurologia',  nombre: 'Neurología',  imagen: '/topicos/neurologia.jpg',  preguntas: 71,     disponible: true },
+      { id: 'hematologia', nombre: 'Hematología', imagen: '/topicos/hematologia.jpg' },
+      { id: 'neurologia',  nombre: 'Neurología',  imagen: '/topicos/neurologia.jpg' },
     ]
   },
 }
@@ -66,9 +74,39 @@ const topicos = {
 export default function Topicos() {
   const { area } = useParams()
   const navigate = useNavigate()
-  const areaData = topicos[area]
+  const areaMeta = topicosMeta[area]
 
-  if (!areaData) return (
+  const [topicos, setTopicos] = useState(
+    areaMeta ? areaMeta.topicos.map(t => ({ ...t, preguntas: 0, disponible: false })) : []
+  )
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (areaMeta) cargarConteos()
+  }, [area])
+
+  const cargarConteos = async () => {
+    setLoading(true)
+
+    // Traemos solo la columna 'topico' de las preguntas de esta área.
+    const { data, error } = await supabase.from('preguntas').select('topico').eq('area', area)
+
+    if (!error && data) {
+      const conteoPorTopico = {}
+      data.forEach(row => {
+        conteoPorTopico[row.topico] = (conteoPorTopico[row.topico] || 0) + 1
+      })
+
+      setTopicos(areaMeta.topicos.map(t => {
+        const total = conteoPorTopico[t.id] || 0
+        return { ...t, preguntas: total, disponible: total >= UMBRAL_DISPONIBLE }
+      }))
+    }
+
+    setLoading(false)
+  }
+
+  if (!areaMeta) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: T.mist }}>
       <p style={{ color: T.textMuted }}>Área no encontrada.</p>
     </div>
@@ -79,7 +117,7 @@ export default function Topicos() {
     navigate(`/preguntas/${top.id}`)
   }
 
-  const disponibles = areaData.topicos.filter(t => t.disponible).length
+  const disponibles = topicos.filter(t => t.disponible).length
 
   return (
     <div style={{
@@ -135,6 +173,19 @@ export default function Topicos() {
           border-color: rgba(255,255,255,0.7);
           color: white;
         }
+
+        @keyframes pulse {
+          0%, 100% { opacity: 0.5; }
+          50% { opacity: 0.9; }
+        }
+        .topico-card-skeleton {
+          background: white;
+          border-radius: 14px;
+          overflow: hidden;
+          border: 1px solid #cbd5e1;
+          height: 220px;
+          animation: pulse 1.4s ease-in-out infinite;
+        }
       `}</style>
 
       {/* NAVBAR */}
@@ -167,82 +218,92 @@ export default function Topicos() {
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
             <path d="M4 2l4 4-4 4" stroke={T.textMuted} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-          <span style={{ fontSize: '0.82rem', color: T.forest, fontWeight: '700' }}>{areaData.nombre}</span>
+          <span style={{ fontSize: '0.82rem', color: T.forest, fontWeight: '700' }}>{areaMeta.nombre}</span>
         </div>
 
         {/* Header */}
         <div style={{ marginBottom: '2.5rem' }}>
           <h1 style={{ fontSize: 'clamp(1.8rem, 3vw, 2.4rem)', fontWeight: '900', color: T.forest, margin: '0 0 6px', letterSpacing: '-0.02em' }}>
-            {areaData.nombre}
+            {areaMeta.nombre}
           </h1>
           <p style={{ fontSize: '0.95rem', color: T.textMuted, margin: '0 0 16px' }}>
-            {areaData.descripcion}
+            {areaMeta.descripcion}
           </p>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', backgroundColor: '#dbeafe', border: '1px solid #bfdbfe', borderRadius: '999px', padding: '4px 12px' }}>
             <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: T.emerald }} />
             <span style={{ fontSize: '0.75rem', fontWeight: '700', color: T.pine }}>
-              {disponibles} {disponibles === 1 ? 'tópico disponible' : 'tópicos disponibles'}
+              {loading ? 'Cargando…' : `${disponibles} ${disponibles === 1 ? 'tópico disponible' : 'tópicos disponibles'}`}
             </span>
           </div>
         </div>
 
         {/* Grid */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-          gap: '1.25rem',
-        }}>
-          {areaData.topicos.map((top) => (
-            <div
-              key={top.id}
-              className={`topico-card${!top.disponible ? ' disabled' : ''}`}
-              onClick={() => handleTopico(top)}
-            >
-              <div style={{ height: '150px', backgroundColor: '#dbeafe', position: 'relative', overflow: 'hidden' }}>
-                <img
-                  src={top.imagen}
-                  alt={top.nombre}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                  onError={e => { e.target.style.display = 'none' }}
-                />
-                <div style={{
-                  position: 'absolute', top: '10px', right: '10px',
-                  backgroundColor: top.disponible ? T.forest : '#6b7280',
-                  color: top.disponible ? T.lime : 'white',
-                  fontSize: '0.7rem', fontWeight: '800',
-                  padding: '3px 10px', borderRadius: '999px',
-                  letterSpacing: '0.03em',
-                }}>
-                  {top.preguntas}{top.disponible && top.preguntas !== 'Pronto' ? ' preguntas' : ''}
-                </div>
-              </div>
-
-              <div style={{ padding: '1.1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <h3 style={{ color: T.forest, fontSize: '1rem', fontWeight: '700', margin: '0 0 3px', letterSpacing: '-0.01em' }}>
-                    {top.nombre}
-                  </h3>
-                  {top.disponible
-                    ? <span style={{ fontSize: '0.75rem', color: T.emerald, fontWeight: '600' }}>Disponible</span>
-                    : <span style={{ fontSize: '0.75rem', color: '#9ca3af', fontWeight: '500' }}>Próximamente</span>
-                  }
-                </div>
-                {top.disponible && (
+        {loading ? (
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+            gap: '1.25rem',
+          }}>
+            {areaMeta.topicos.map(t => <div key={t.id} className="topico-card-skeleton" />)}
+          </div>
+        ) : (
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+            gap: '1.25rem',
+          }}>
+            {topicos.map((top) => (
+              <div
+                key={top.id}
+                className={`topico-card${!top.disponible ? ' disabled' : ''}`}
+                onClick={() => handleTopico(top)}
+              >
+                <div style={{ height: '150px', backgroundColor: '#dbeafe', position: 'relative', overflow: 'hidden' }}>
+                  <img
+                    src={top.imagen}
+                    alt={top.nombre}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    onError={e => { e.target.style.display = 'none' }}
+                  />
                   <div style={{
-                    width: '32px', height: '32px', borderRadius: '50%',
-                    backgroundColor: '#dbeafe', border: `1.5px solid ${T.border}`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    flexShrink: 0,
+                    position: 'absolute', top: '10px', right: '10px',
+                    backgroundColor: top.disponible ? T.forest : '#6b7280',
+                    color: top.disponible ? T.lime : 'white',
+                    fontSize: '0.7rem', fontWeight: '800',
+                    padding: '3px 10px', borderRadius: '999px',
+                    letterSpacing: '0.03em',
                   }}>
-                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                      <path d="M2 6h8M7 3l3 3-3 3" stroke={T.emerald} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
+                    {top.preguntas} preguntas
                   </div>
-                )}
+                </div>
+
+                <div style={{ padding: '1.1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <h3 style={{ color: T.forest, fontSize: '1rem', fontWeight: '700', margin: '0 0 3px', letterSpacing: '-0.01em' }}>
+                      {top.nombre}
+                    </h3>
+                    {top.disponible
+                      ? <span style={{ fontSize: '0.75rem', color: T.emerald, fontWeight: '600' }}>Disponible</span>
+                      : <span style={{ fontSize: '0.75rem', color: '#9ca3af', fontWeight: '500' }}>Próximamente</span>
+                    }
+                  </div>
+                  {top.disponible && (
+                    <div style={{
+                      width: '32px', height: '32px', borderRadius: '50%',
+                      backgroundColor: '#dbeafe', border: `1.5px solid ${T.border}`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      flexShrink: 0,
+                    }}>
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                        <path d="M2 6h8M7 3l3 3-3 3" stroke={T.emerald} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
       </div>
     </div>

@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
@@ -13,17 +14,51 @@ const T = {
   lime:      '#60a5d4',
 }
 
-const areas = [
-  { id: 'fisiologia',       nombre: 'Fisiología',       imagen: '/topicos/fisiologia.jpg',       preguntas: 41,     disponible: true  },
-  { id: 'fisiopatologia',   nombre: 'Fisiopatología',   imagen: '/topicos/fisiopatologia.jpg',   preguntas: 117,    disponible: true  },
-  { id: 'anatomia',         nombre: 'Anatomía',         imagen: '/topicos/anatomia.jpg',         preguntas: 36,     disponible: true  },
-  { id: 'histologia',       nombre: 'Histología',       imagen: '/topicos/histologia.jpg',       preguntas: 26,     disponible: true  },
-  { id: 'embriologia',      nombre: 'Embriología',      imagen: '/topicos/embriologia.jpg',      preguntas: 31,     disponible: true  },
-  { id: 'medicina_interna', nombre: 'Medicina Interna', imagen: '/topicos/medicina_interna.jpg', preguntas: 256,    disponible: true  },
+// Umbral mínimo de preguntas para que un área se muestre como "Disponible".
+// Súbelo o bájalo aquí cuando quieras cambiar el criterio.
+const UMBRAL_DISPONIBLE = 20
+
+// Metadata estática de cada área (esto no vive en la base de datos).
+// El conteo de preguntas y el flag "disponible" ahora se calculan en vivo.
+const areasMeta = [
+  { id: 'fisiologia',       nombre: 'Fisiología',       imagen: '/topicos/fisiologia.jpg' },
+  { id: 'fisiopatologia',   nombre: 'Fisiopatología',   imagen: '/topicos/fisiopatologia.jpg' },
+  { id: 'anatomia',         nombre: 'Anatomía',         imagen: '/topicos/anatomia.jpg' },
+  { id: 'histologia',       nombre: 'Histología',       imagen: '/topicos/histologia.jpg' },
+  { id: 'embriologia',      nombre: 'Embriología',      imagen: '/topicos/embriologia.jpg' },
+  { id: 'medicina_interna', nombre: 'Medicina Interna', imagen: '/topicos/medicina_interna.jpg' },
 ]
 
 export default function Areas() {
   const navigate = useNavigate()
+  const [areas, setAreas] = useState(
+    areasMeta.map(a => ({ ...a, preguntas: 0, disponible: false }))
+  )
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => { cargarConteos() }, [])
+
+  const cargarConteos = async () => {
+    setLoading(true)
+
+    // Traemos solo la columna 'area' de todas las preguntas para contar.
+    // Es una consulta liviana incluso con miles de filas.
+    const { data, error } = await supabase.from('preguntas').select('area')
+
+    if (!error && data) {
+      const conteoPorArea = {}
+      data.forEach(row => {
+        conteoPorArea[row.area] = (conteoPorArea[row.area] || 0) + 1
+      })
+
+      setAreas(areasMeta.map(a => {
+        const total = conteoPorArea[a.id] || 0
+        return { ...a, preguntas: total, disponible: total >= UMBRAL_DISPONIBLE }
+      }))
+    }
+
+    setLoading(false)
+  }
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -86,6 +121,19 @@ export default function Areas() {
           border-color: rgba(255,255,255,0.7);
           color: white;
         }
+
+        @keyframes pulse {
+          0%, 100% { opacity: 0.5; }
+          50% { opacity: 0.9; }
+        }
+        .area-card-skeleton {
+          background: white;
+          border-radius: 14px;
+          overflow: hidden;
+          border: 1px solid #cbd5e1;
+          height: 220px;
+          animation: pulse 1.4s ease-in-out infinite;
+        }
       `}</style>
 
       {/* NAVBAR */}
@@ -120,62 +168,72 @@ export default function Areas() {
           </p>
         </div>
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-          gap: '1.25rem',
-        }}>
-          {areas.map((area) => (
-            <div
-              key={area.id}
-              className={`area-card${!area.disponible ? ' disabled' : ''}`}
-              onClick={() => handleArea(area)}
-            >
-              <div style={{ height: '150px', backgroundColor: '#dbeafe', position: 'relative', overflow: 'hidden' }}>
-                <img
-                  src={area.imagen}
-                  alt={area.nombre}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                  onError={e => { e.target.style.display = 'none' }}
-                />
-                <div style={{
-                  position: 'absolute', top: '10px', right: '10px',
-                  backgroundColor: area.disponible ? T.forest : '#6b7280',
-                  color: area.disponible ? T.lime : 'white',
-                  fontSize: '0.7rem', fontWeight: '800',
-                  padding: '3px 10px', borderRadius: '999px',
-                  letterSpacing: '0.03em',
-                }}>
-                  {area.preguntas} preguntas
-                </div>
-              </div>
-
-              <div style={{ padding: '1.1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <h3 style={{ color: T.forest, fontSize: '1rem', fontWeight: '700', margin: '0 0 3px', letterSpacing: '-0.01em' }}>
-                    {area.nombre}
-                  </h3>
-                  {area.disponible
-                    ? <span style={{ fontSize: '0.75rem', color: T.emerald, fontWeight: '600' }}>Disponible</span>
-                    : <span style={{ fontSize: '0.75rem', color: '#9ca3af', fontWeight: '500' }}>Próximamente</span>
-                  }
-                </div>
-                {area.disponible && (
+        {loading ? (
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+            gap: '1.25rem',
+          }}>
+            {areasMeta.map(a => <div key={a.id} className="area-card-skeleton" />)}
+          </div>
+        ) : (
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+            gap: '1.25rem',
+          }}>
+            {areas.map((area) => (
+              <div
+                key={area.id}
+                className={`area-card${!area.disponible ? ' disabled' : ''}`}
+                onClick={() => handleArea(area)}
+              >
+                <div style={{ height: '150px', backgroundColor: '#dbeafe', position: 'relative', overflow: 'hidden' }}>
+                  <img
+                    src={area.imagen}
+                    alt={area.nombre}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    onError={e => { e.target.style.display = 'none' }}
+                  />
                   <div style={{
-                    width: '32px', height: '32px', borderRadius: '50%',
-                    backgroundColor: '#dbeafe', border: `1.5px solid ${T.border}`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    flexShrink: 0,
+                    position: 'absolute', top: '10px', right: '10px',
+                    backgroundColor: area.disponible ? T.forest : '#6b7280',
+                    color: area.disponible ? T.lime : 'white',
+                    fontSize: '0.7rem', fontWeight: '800',
+                    padding: '3px 10px', borderRadius: '999px',
+                    letterSpacing: '0.03em',
                   }}>
-                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                      <path d="M2 6h8M7 3l3 3-3 3" stroke={T.emerald} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
+                    {area.preguntas} preguntas
                   </div>
-                )}
+                </div>
+
+                <div style={{ padding: '1.1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <h3 style={{ color: T.forest, fontSize: '1rem', fontWeight: '700', margin: '0 0 3px', letterSpacing: '-0.01em' }}>
+                      {area.nombre}
+                    </h3>
+                    {area.disponible
+                      ? <span style={{ fontSize: '0.75rem', color: T.emerald, fontWeight: '600' }}>Disponible</span>
+                      : <span style={{ fontSize: '0.75rem', color: '#9ca3af', fontWeight: '500' }}>Próximamente</span>
+                    }
+                  </div>
+                  {area.disponible && (
+                    <div style={{
+                      width: '32px', height: '32px', borderRadius: '50%',
+                      backgroundColor: '#dbeafe', border: `1.5px solid ${T.border}`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      flexShrink: 0,
+                    }}>
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                        <path d="M2 6h8M7 3l3 3-3 3" stroke={T.emerald} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
       </div>
     </div>
