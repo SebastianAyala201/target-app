@@ -32,6 +32,7 @@ const topicosMeta = {
       { id: 'fisiologia_cardiovascular',    nombre: 'Fisiología Cardiovascular',    imagen: '/topicos/fisiologia_cardiovascular.jpg' },
       { id: 'fisiologia_respiratoria',    nombre: 'Fisiología Respiratoria',    imagen: '/topicos/fisiologia_respiratoria.jpg' },
       { id: 'fisiologia_neurologica',    nombre: 'Fisiología Neurologica',    imagen: '/topicos/fisiologia_neurologica.jpg' },
+      { id: 'fisiologia_sangre',    nombre: 'Fisiología de la Sangre',    imagen: '/topicos/fisiologia_sangre.jpg' },
     ]
   },
   fisiopatologia: {
