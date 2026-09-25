@@ -49,6 +49,7 @@ const topicosMeta = {
     descripcion: 'Estructura y organización del cuerpo humano.',
     topicos: [
       { id: 'anatomia_cardiovascular', nombre: 'Cardiovascular', imagen: '/topicos/anatomia_cardiovascular.jpg' },
+      { id: 'anatomia_respiratoria', nombre: 'Respiratorio', imagen: '/topicos/anatomia_respiratoria.jpg' },
     ]
   },
   histologia: {
@@ -56,6 +57,7 @@ const topicosMeta = {
     descripcion: 'Estudio microscópico de los tejidos del organismo.',
     topicos: [
       { id: 'histologia_cardiovascular', nombre: 'Cardiovascular', imagen: '/topicos/histologia_cardiovascular.jpg' },
+      { id: 'histologia_respiratoria', nombre: 'Respiratorio', imagen: '/topicos/histologia_respiratoria.jpg' },
     ]
   },
   embriologia: {
@@ -64,6 +66,7 @@ const topicosMeta = {
     topicos: [
       { id: 'embriologia_cardiovascular', nombre: 'Cardiovascular', imagen: '/topicos/embriologia_cardiovascular.jpg' },
       { id: 'embriologia_renal',          nombre: 'Renal',          imagen: '/topicos/embriologia_renal.jpg' },
+      { id: 'embriologia_respiratoria',   nombre: 'Respiratorio',          imagen: '/topicos/embriologia_respiratoria.jpg' },
     ]
   },
   medicina_interna: {
