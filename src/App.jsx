@@ -7,9 +7,11 @@ import Topicos from './pages/Topicos'
 import Questions from './pages/Questions'
 import Stats from './pages/Stats'
 import AutorizadoRoute from './components/AutorizadoRoute'
+import AdminRoute from './components/AdminRoute'
 import Terminos from './pages/Terminos'
 import Dashboard from './pages/Dashboard'
 import QuestionInspector from './pages/QuestionInspector'
+import AdminPanel from './pages/AdminPanel'
 
 function App() {
   return (
@@ -39,11 +41,20 @@ function App() {
           </AutorizadoRoute>
         } />
         <Route path="/terminos" element={<Terminos />} />
-        <Route path="/inspector" element={<QuestionInspector />} />
+        <Route path="/inspector" element={
+          <AutorizadoRoute>
+            <QuestionInspector />
+          </AutorizadoRoute>
+        } />
         <Route path="/dashboard" element={
           <AutorizadoRoute>
             <Dashboard />
           </AutorizadoRoute>
+        } />
+        <Route path="/admin" element={
+          <AdminRoute>
+            <AdminPanel />
+          </AdminRoute>
         } />
       </Routes>
     </BrowserRouter>

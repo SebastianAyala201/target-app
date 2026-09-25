@@ -35,8 +35,23 @@ export default function Areas() {
     areasMeta.map(a => ({ ...a, preguntas: 0, disponible: false }))
   )
   const [loading, setLoading] = useState(true)
+  const [esAdmin, setEsAdmin] = useState(false)
 
-  useEffect(() => { cargarConteos() }, [])
+  useEffect(() => {
+    cargarConteos()
+    chequearAdmin()
+  }, [])
+
+  const chequearAdmin = async () => {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) return
+    const { data } = await supabase
+      .from('admins')
+      .select('user_id')
+      .eq('user_id', session.user.id)
+      .maybeSingle()
+    if (data) setEsAdmin(true)
+  }
 
   const cargarConteos = async () => {
     setLoading(true)
@@ -149,6 +164,11 @@ export default function Areas() {
           <span style={{ color: 'white', fontWeight: '800', fontSize: '0.95rem', letterSpacing: '0.06em' }}>HIGH YIELDS</span>
         </div>
         <div style={{ display: 'flex', gap: '0.6rem' }}>
+          {esAdmin && (
+            <button className="nav-btn" style={{ borderColor: T.lime, color: T.lime }} onClick={() => navigate('/admin')}>
+              Panel admin
+            </button>
+          )}
           <button className="nav-btn" onClick={() => navigate('/dashboard')}>Mi progreso</button>
           <button className="nav-btn" onClick={handleLogout}>Cerrar sesión</button>
         </div>
