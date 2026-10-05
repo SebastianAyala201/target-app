@@ -65,18 +65,23 @@ export default function Questions() {
     setLoading(false)
   }
 
+  // Devuelve true si la pregunta cargó. Devuelve false si ya no está disponible (por ejemplo,
+  // un admin la ocultó con la sesión en curso) o si falló la conexión.
   const cargarPregunta = async (idx, idsActuales) => {
     setLoadingPregunta(true)
-    const { data, error } = await supabase.from('preguntas').select('*').eq('id', idsActuales[idx]).single()
-    if (!error && data) setPreguntaActual(data)
+    const { data, error } = await supabase.from('preguntas').select('*').eq('id', idsActuales[idx]).maybeSingle()
+    const ok = !error && !!data
+    if (ok) setPreguntaActual(data)
     setLoadingPregunta(false)
+    return ok
   }
 
   const idsActivos = ids.slice(0, totalSeleccionado)
 
   const iniciarSesion = async () => {
     setConfigurando(false)
-    await cargarPregunta(0, ids.slice(0, totalSeleccionado))
+    const ok = await cargarPregunta(0, ids.slice(0, totalSeleccionado))
+    if (!ok) { setConfigurando(true); cargarIds(); return }
     if (modoExamen) setTiempoRestante(tiempoTotal * 60)
   }
 
@@ -111,7 +116,11 @@ export default function Questions() {
     const sig = historial[nuevoIndice]
     setIndice(nuevoIndice)
     if (sig) { setPreguntaActual(sig.pregunta); setSeleccion(sig.seleccion); setRespondida(sig.respondida) }
-    else { setSeleccion(null); setRespondida(false); await cargarPregunta(nuevoIndice, idsActivos) }
+    else {
+      setSeleccion(null); setRespondida(false)
+      const ok = await cargarPregunta(nuevoIndice, idsActivos)
+      if (!ok) handleFinalizar()   // ya no está disponible: se cierra la sesión y se muestra Stats
+    }
   }
 
   const handleAnterior = async () => {

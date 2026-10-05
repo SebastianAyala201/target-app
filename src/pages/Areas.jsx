@@ -56,14 +56,15 @@ export default function Areas() {
   const cargarConteos = async () => {
     setLoading(true)
 
-    // Traemos solo la columna 'area' de todas las preguntas para contar.
-    // Es una consulta liviana incluso con miles de filas.
-    const { data, error } = await supabase.from('preguntas').select('area')
+    // El conteo lo hace la base (función conteo_preguntas, que respeta RLS: un alumno
+    // solo cuenta preguntas activas, un admin cuenta todas). Así no choca con el
+    // límite de 1000 filas por consulta de la API.
+    const { data, error } = await supabase.rpc('conteo_preguntas')
 
     if (!error && data) {
       const conteoPorArea = {}
       data.forEach(row => {
-        conteoPorArea[row.area] = (conteoPorArea[row.area] || 0) + 1
+        conteoPorArea[row.area] = (conteoPorArea[row.area] || 0) + Number(row.total)
       })
 
       setAreas(areasMeta.map(a => {

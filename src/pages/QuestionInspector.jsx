@@ -1,15 +1,10 @@
 import { useState } from 'react'
-import { createClient } from '@supabase/supabase-js'
+import { supabase } from '../lib/supabase'
 import ReactMarkdown from 'react-markdown'
 import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import 'katex/dist/katex.min.css'
 import remarkGfm from 'remark-gfm'
-
-const supabase = createClient(
-  'https://wwaqrfpuiplblucqaudx.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3YXFyZnB1aXBsYmx1Y3FhdWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMDEwNDIsImV4cCI6MjA5MDc3NzA0Mn0.G-1K6YEPwrPu8MiiGuRH6V-6yTuIU-fmuVrMa10yMdo'
-)
 
 const areaColors = {
   histologia: { bg: '#dbeafe', color: '#1e40af', border: '#93c5fd' },
@@ -185,6 +180,11 @@ export default function QuestionInspector() {
               <span style={{ backgroundColor: '#fef9c3', color: '#854d0e', border: '1px solid #fde047', fontSize: '0.78rem', fontWeight: '600', padding: '4px 12px', borderRadius: '999px' }}>
                 {pregunta.enfoque}
               </span>
+              {pregunta.estado && pregunta.estado !== 'activa' && (
+                <span style={{ backgroundColor: '#fffbeb', color: '#b45309', border: '1px solid #fde68a', fontSize: '0.78rem', fontWeight: '700', padding: '4px 12px', borderRadius: '999px' }}>
+                  {pregunta.estado.toUpperCase()} · los alumnos no la ven
+                </span>
+              )}
             </div>
 
             {/* CARD PREGUNTA */}

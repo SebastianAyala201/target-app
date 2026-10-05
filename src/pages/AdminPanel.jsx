@@ -30,9 +30,14 @@ const AREA_TOPICO_MAP = {
   fisiologia: {
     nombre: 'Fisiología',
     topicos: [
-      { id: 'fisiologia_celular',  nombre: 'Fisiología Celular' },
-      { id: 'fisiologia_nerviosa', nombre: 'Fisiología Nerviosa' },
-      { id: 'fisiologia_renal',    nombre: 'Fisiología Renal' },
+      { id: 'fisiologia_celular',        nombre: 'Fisiología Celular' },
+      { id: 'fisiologia_cardiovascular', nombre: 'Fisiología Cardiovascular' },
+      { id: 'fisiologia_digestiva',      nombre: 'Fisiología Digestiva' },
+      { id: 'fisiologia_endocrina',      nombre: 'Fisiología Endocrina' },
+      { id: 'fisiologia_neurologica',    nombre: 'Fisiología Neurológica' },
+      { id: 'fisiologia_renal',          nombre: 'Fisiología Renal' },
+      { id: 'fisiologia_respiratoria',   nombre: 'Fisiología Respiratoria' },
+      { id: 'fisiologia_sangre',         nombre: 'Fisiología de la Sangre' },
     ]
   },
   fisiopatologia: {
@@ -46,20 +51,23 @@ const AREA_TOPICO_MAP = {
   anatomia: {
     nombre: 'Anatomía',
     topicos: [
-      { id: 'anatomia_cardiovascular', nombre: 'Cardiovascular' },
+      { id: 'anatomia_cardiovascular', nombre: 'Anatomía Cardiovascular' },
+      { id: 'anatomia_respiratoria',   nombre: 'Anatomía Respiratoria' },
     ]
   },
   histologia: {
     nombre: 'Histología',
     topicos: [
-      { id: 'histologia_cardiovascular', nombre: 'Cardiovascular' },
+      { id: 'histologia_cardiovascular', nombre: 'Histología Cardiovascular' },
+      { id: 'histologia_respiratoria',  nombre: 'Histología Respiratoria' },
     ]
   },
   embriologia: {
     nombre: 'Embriología',
     topicos: [
-      { id: 'embriologia_cardiovascular', nombre: 'Cardiovascular' },
-      { id: 'embriologia_renal',          nombre: 'Renal' },
+      { id: 'embriologia_cardiovascular', nombre: 'Embriología Cardiovascular' },
+      { id: 'embriologia_renal',          nombre: 'Embriología Renal' },
+      { id: 'embriologia_respiratoria',   nombre: 'Embriología Respiratoria' },
     ]
   },
   medicina_interna: {
@@ -92,9 +100,37 @@ const CAMPO_VACIO = {
   explicacion_opciones: '',
   objetivo_educativo: '',
   bibliografia: '',
+  estado: 'activa',
 }
 
 const PAGE_SIZE = 15
+
+// Estados de una pregunta. 'activa' = la ven los alumnos; 'oculta' y 'borrador' = solo admins
+// (esto lo hace cumplir la política RLS de lectura en Supabase, no solo la interfaz).
+const ESTADOS = [
+  { id: 'activa',   nombre: 'Activa',   color: '#16a34a', bg: '#f0fdf4', borde: '#bbf7d0' },
+  { id: 'oculta',   nombre: 'Oculta',   color: '#b45309', bg: '#fffbeb', borde: '#fde68a' },
+  { id: 'borrador', nombre: 'Borrador', color: '#475569', bg: '#f1f5f9', borde: '#cbd5e1' },
+]
+
+function EstadoBadge({ estado }) {
+  const e = ESTADOS.find(x => x.id === estado) || ESTADOS[0]
+  return (
+    <span style={{ backgroundColor: e.bg, color: e.color, border: `1px solid ${e.borde}`, fontSize: '0.72rem', fontWeight: '700', padding: '2px 9px', borderRadius: '999px' }}>
+      {e.nombre}
+    </span>
+  )
+}
+
+function Resumen({ c }) {
+  return (
+    <>
+      {c.activa} activas
+      {c.oculta > 0 && <span style={{ color: '#b45309' }}> · {c.oculta} ocultas</span>}
+      {c.borrador > 0 && <span style={{ color: '#475569' }}> · {c.borrador} borradores</span>}
+    </>
+  )
+}
 
 const inputStyle = {
   width: '100%', padding: '9px 12px', borderRadius: '8px',
@@ -211,7 +247,7 @@ export default function AdminPanel() {
 // ─────────────────────────────────────────────────────────
 function StatsTab() {
   const [estructura, setEstructura] = useState(null)
-  const [totalGeneral, setTotalGeneral] = useState(0)
+  const [totales, setTotales] = useState({ activa: 0, oculta: 0, borrador: 0 })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -220,28 +256,39 @@ function StatsTab() {
   const cargar = async () => {
     setLoading(true)
     setError('')
-    const { data, error: err } = await supabase.from('preguntas').select('area, topico, subtopico')
+
+    // El conteo lo hace la base de datos (función conteo_preguntas). Así no choca con
+    // el límite de 1000 filas por consulta de la API ni depende de traer todas las preguntas.
+    const { data, error: err } = await supabase.rpc('conteo_preguntas')
 
     if (err) {
-      setError('No se pudo cargar. Revisa que la tabla admins tenga tu correo y que corriste el script SQL.')
+      setError('No se pudo cargar: ' + err.message + ' — ¿ya creaste la función conteo_preguntas() en Supabase?')
       setLoading(false)
       return
     }
 
+    const nuevo = () => ({ activa: 0, oculta: 0, borrador: 0 })
     const est = {}
+    const tot = nuevo()
+
     data.forEach(row => {
       const area = row.area || '(sin área)'
       const topico = row.topico || '(sin tópico)'
       const subtopico = row.subtopico || '(sin subtópico)'
-      if (!est[area]) est[area] = { total: 0, topicos: {} }
-      est[area].total++
-      if (!est[area].topicos[topico]) est[area].topicos[topico] = { total: 0, subtopicos: {} }
-      est[area].topicos[topico].total++
-      est[area].topicos[topico].subtopicos[subtopico] = (est[area].topicos[topico].subtopicos[subtopico] || 0) + 1
+      const estado = row.estado
+      const n = Number(row.total)
+
+      tot[estado] += n
+      if (!est[area]) est[area] = { cnt: nuevo(), topicos: {} }
+      est[area].cnt[estado] += n
+      if (!est[area].topicos[topico]) est[area].topicos[topico] = { cnt: nuevo(), subtopicos: {} }
+      est[area].topicos[topico].cnt[estado] += n
+      if (!est[area].topicos[topico].subtopicos[subtopico]) est[area].topicos[topico].subtopicos[subtopico] = nuevo()
+      est[area].topicos[topico].subtopicos[subtopico][estado] += n
     })
 
     setEstructura(est)
-    setTotalGeneral(data.length)
+    setTotales(tot)
     setLoading(false)
   }
 
@@ -250,28 +297,41 @@ function StatsTab() {
 
   return (
     <div>
-      <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
         <div>
           <h1 style={{ fontSize: '1.6rem', fontWeight: '900', color: T.forest, margin: '0 0 4px' }}>Estadísticas</h1>
           <p style={{ fontSize: '0.85rem', color: T.textMuted, margin: 0 }}>
-            {totalGeneral} preguntas en total · un tópico se muestra como "Disponible" a estudiantes desde las {UMBRAL_DISPONIBLE} preguntas
+            Un tópico se muestra como "Disponible" a los estudiantes desde las {UMBRAL_DISPONIBLE} preguntas activas.
           </p>
         </div>
         <button className="btn-sec" onClick={cargar}>Actualizar</button>
       </div>
 
+      <div style={{ display: 'flex', gap: '10px', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
+        {ESTADOS.map(e => (
+          <div key={e.id} style={{ backgroundColor: e.bg, border: `1px solid ${e.borde}`, borderRadius: '12px', padding: '10px 18px', minWidth: '130px' }}>
+            <div style={{ fontSize: '1.5rem', fontWeight: '900', color: e.color, lineHeight: 1 }}>{totales[e.id]}</div>
+            <div style={{ fontSize: '0.75rem', fontWeight: '600', color: e.color, marginTop: '3px' }}>{e.nombre}s</div>
+          </div>
+        ))}
+        <div style={{ backgroundColor: T.surface, border: `1px solid ${T.border}`, borderRadius: '12px', padding: '10px 18px', minWidth: '130px' }}>
+          <div style={{ fontSize: '1.5rem', fontWeight: '900', color: T.forest, lineHeight: 1 }}>{totales.activa + totales.oculta + totales.borrador}</div>
+          <div style={{ fontSize: '0.75rem', fontWeight: '600', color: T.textMuted, marginTop: '3px' }}>En la tabla</div>
+        </div>
+      </div>
+
       <div style={{ backgroundColor: T.surface, borderRadius: '14px', border: `1px solid ${T.border}`, padding: '0.5rem 1.5rem' }}>
-        {Object.entries(estructura).sort((a, b) => b[1].total - a[1].total).map(([area, dataArea]) => (
+        {Object.entries(estructura).sort((a, b) => b[1].cnt.activa - a[1].cnt.activa).map(([area, dataArea]) => (
           <details key={area} className="stats-area" style={{ borderBottom: `1px solid ${T.border}` }}>
             <summary style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span>{AREA_TOPICO_MAP[area]?.nombre || area}</span>
               <span style={{ fontSize: '0.8rem', fontWeight: '700', color: T.emerald, background: '#dbeafe', padding: '2px 10px', borderRadius: '999px' }}>
-                {dataArea.total} preguntas
+                <Resumen c={dataArea.cnt} />
               </span>
             </summary>
             <div style={{ paddingBottom: '0.5rem' }}>
-              {Object.entries(dataArea.topicos).sort((a, b) => b[1].total - a[1].total).map(([topico, dataTopico]) => {
-                const disponible = dataTopico.total >= UMBRAL_DISPONIBLE
+              {Object.entries(dataArea.topicos).sort((a, b) => b[1].cnt.activa - a[1].cnt.activa).map(([topico, dataTopico]) => {
+                const disponible = dataTopico.cnt.activa >= UMBRAL_DISPONIBLE
                 return (
                   <details key={topico} className="stats-topico">
                     <summary style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -280,14 +340,14 @@ function StatsTab() {
                         {topico}
                       </span>
                       <span style={{ fontSize: '0.78rem', fontWeight: '700', color: disponible ? T.success : T.textMuted }}>
-                        {dataTopico.total}
+                        <Resumen c={dataTopico.cnt} />
                       </span>
                     </summary>
                     <div style={{ paddingLeft: '2.5rem', paddingBottom: '10px' }}>
-                      {Object.entries(dataTopico.subtopicos).sort((a, b) => b[1] - a[1]).map(([subtopico, count]) => (
-                        <div key={subtopico} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: '0.82rem', color: T.textMuted, maxWidth: '420px' }}>
+                      {Object.entries(dataTopico.subtopicos).sort((a, b) => b[1].activa - a[1].activa).map(([subtopico, c]) => (
+                        <div key={subtopico} style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', padding: '4px 0', fontSize: '0.82rem', color: T.textMuted, maxWidth: '520px' }}>
                           <span>{subtopico}</span>
-                          <span style={{ fontWeight: '600', color: T.text }}>{count}</span>
+                          <span style={{ fontWeight: '600', color: T.text }}><Resumen c={c} /></span>
                         </div>
                       ))}
                     </div>
@@ -313,19 +373,21 @@ function CrudTab() {
   const [loadingLista, setLoadingLista] = useState(true)
   const [busqueda, setBusqueda] = useState('')
   const [filtroArea, setFiltroArea] = useState('')
+  const [filtroEstado, setFiltroEstado] = useState('')
   const [form, setForm] = useState(CAMPO_VACIO)
   const [guardando, setGuardando] = useState(false)
   const [mensaje, setMensaje] = useState('')
 
-  useEffect(() => { cargarLista() }, [pagina, filtroArea])
+  useEffect(() => { cargarLista() }, [pagina, filtroArea, filtroEstado])
 
   const cargarLista = async () => {
     setLoadingLista(true)
     let query = supabase
       .from('preguntas')
-      .select('id, area, topico, subtopico, enunciado, respuesta_correcta', { count: 'exact' })
+      .select('id, area, topico, subtopico, enunciado, respuesta_correcta, estado', { count: 'exact' })
 
     if (filtroArea) query = query.eq('area', filtroArea)
+    if (filtroEstado) query = query.eq('estado', filtroEstado)
 
     if (busqueda.trim()) {
       const num = parseInt(busqueda.trim())
@@ -349,8 +411,16 @@ function CrudTab() {
   }
 
   const buscar = () => {
-    setPagina(0)
-    cargarLista()
+    // Si ya estamos en la página 0 recargamos directo; si no, el useEffect recarga al cambiar de página
+    if (pagina === 0) cargarLista()
+    else setPagina(0)
+  }
+
+  const cambiarEstado = async (id, nuevoEstado) => {
+    if (nuevoEstado === 'oculta' && !window.confirm(`¿Ocultar la pregunta #${id}? Los alumnos dejarán de verla. Puedes reactivarla cuando quieras.`)) return
+    const { error } = await supabase.from('preguntas').update({ estado: nuevoEstado }).eq('id', id)
+    if (error) alert('No se pudo cambiar el estado: ' + error.message)
+    else cargarLista()
   }
 
   const abrirNueva = () => {
@@ -407,7 +477,12 @@ function CrudTab() {
   }
 
   const totalPaginas = Math.max(1, Math.ceil(totalCount / PAGE_SIZE))
-  const topicosDelArea = form.area ? (AREA_TOPICO_MAP[form.area]?.topicos || []) : []
+  const topicosBase = form.area ? (AREA_TOPICO_MAP[form.area]?.topicos || []) : []
+  // Si la pregunta ya trae un tópico que no está en la lista, se agrega como opción
+  // para que al editar no se pierda ni se cambie por accidente.
+  const topicosDelArea = form.topico && !topicosBase.some(t => t.id === form.topico)
+    ? [...topicosBase, { id: form.topico, nombre: `${form.topico} (no está en la lista)` }]
+    : topicosBase
 
   if (vista === 'form') {
     return (
@@ -452,9 +527,20 @@ function CrudTab() {
             </div>
           </div>
 
-          <div style={fieldWrap}>
-            <label style={labelStyle}>Enfoque</label>
-            <input name="enfoque" value={form.enfoque || ''} onChange={handleChange} style={{ ...inputStyle, maxWidth: '200px' }} placeholder="ej: USA" />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div style={fieldWrap}>
+              <label style={labelStyle}>Enfoque</label>
+              <input name="enfoque" value={form.enfoque || ''} onChange={handleChange} style={inputStyle} placeholder="ej: USA" />
+            </div>
+            <div style={fieldWrap}>
+              <label style={labelStyle}>Estado</label>
+              <select name="estado" value={form.estado || 'activa'} onChange={handleChange} style={inputStyle}>
+                {ESTADOS.map(e => <option key={e.id} value={e.id}>{e.nombre}</option>)}
+              </select>
+              <p style={{ fontSize: '0.72rem', color: T.textMuted, margin: '4px 0 0' }}>
+                Activa: la ven los alumnos · Oculta o borrador: solo admins.
+              </p>
+            </div>
           </div>
 
           <div style={fieldWrap}>
@@ -551,6 +637,14 @@ function CrudTab() {
             <option key={id} value={id}>{a.nombre}</option>
           ))}
         </select>
+        <select
+          value={filtroEstado}
+          onChange={e => { setFiltroEstado(e.target.value); setPagina(0) }}
+          style={{ ...inputStyle, maxWidth: '180px' }}
+        >
+          <option value="">Todos los estados</option>
+          {ESTADOS.map(e => <option key={e.id} value={e.id}>{e.nombre}s</option>)}
+        </select>
         <button className="btn-sec" onClick={buscar}>Buscar</button>
       </div>
 
@@ -569,20 +663,25 @@ function CrudTab() {
                   <th>Tópico</th>
                   <th>Enunciado</th>
                   <th>Resp.</th>
+                  <th>Estado</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody>
                 {lista.map(p => (
-                  <tr key={p.id}>
+                  <tr key={p.id} style={p.estado !== 'activa' ? { opacity: 0.6 } : undefined}>
                     <td style={{ fontWeight: '700', color: T.textMuted }}>#{p.id}</td>
                     <td>{AREA_TOPICO_MAP[p.area]?.nombre || p.area}</td>
                     <td>{p.topico}</td>
                     <td style={{ maxWidth: '360px' }}>{(p.enunciado || '').slice(0, 90)}{(p.enunciado || '').length > 90 ? '…' : ''}</td>
                     <td style={{ fontWeight: '700', color: T.emerald }}>{p.respuesta_correcta}</td>
+                    <td><EstadoBadge estado={p.estado} /></td>
                     <td>
                       <div style={{ display: 'flex', gap: '6px' }}>
                         <button className="btn-edit" onClick={() => abrirEdicion(p.id)}>Editar</button>
+                        {p.estado === 'activa'
+                          ? <button className="btn-sec" style={{ padding: '6px 12px', fontSize: '0.78rem' }} onClick={() => cambiarEstado(p.id, 'oculta')}>Ocultar</button>
+                          : <button className="btn-sec" style={{ padding: '6px 12px', fontSize: '0.78rem' }} onClick={() => cambiarEstado(p.id, 'activa')}>Activar</button>}
                         <button className="btn-danger" onClick={() => eliminar(p.id)}>Eliminar</button>
                       </div>
                     </td>

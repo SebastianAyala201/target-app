@@ -42,9 +42,9 @@ function App() {
         } />
         <Route path="/terminos" element={<Terminos />} />
         <Route path="/inspector" element={
-          <AutorizadoRoute>
+          <AdminRoute>
             <QuestionInspector />
-          </AutorizadoRoute>
+          </AdminRoute>
         } />
         <Route path="/dashboard" element={
           <AutorizadoRoute>

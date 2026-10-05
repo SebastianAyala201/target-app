@@ -31,7 +31,7 @@ const topicosMeta = {
       { id: 'fisiologia_endocrina',    nombre: 'Fisiología Endocrina',    imagen: '/topicos/fisiologia_endocrina.jpg' },
       { id: 'fisiologia_cardiovascular',    nombre: 'Fisiología Cardiovascular',    imagen: '/topicos/fisiologia_cardiovascular.jpg' },
       { id: 'fisiologia_respiratoria',    nombre: 'Fisiología Respiratoria',    imagen: '/topicos/fisiologia_respiratoria.jpg' },
-      { id: 'fisiologia_neurologica',    nombre: 'Fisiología Neurologica',    imagen: '/topicos/fisiologia_neurologica.jpg' },
+      { id: 'fisiologia_neurologica',    nombre: 'Fisiología Neurológica',    imagen: '/topicos/fisiologia_neurologica.jpg' },
       { id: 'fisiologia_sangre',    nombre: 'Fisiología de la Sangre',    imagen: '/topicos/fisiologia_sangre.jpg' },
     ]
   },
@@ -79,6 +79,14 @@ const topicosMeta = {
   },
 }
 
+// Si en la base aparece un tópico que no está en topicosMeta, se muestra con un nombre
+// generado a partir de su id (ej: "fisiologia_nueva" -> "Fisiologia nueva") y la imagen
+// /topicos/<id>.jpg. Para ponerle tilde, nombre o imagen propios, agrégalo en topicosMeta.
+const nombreDesdeId = (id) => {
+  const texto = id.replace(/_/g, ' ')
+  return texto.charAt(0).toUpperCase() + texto.slice(1)
+}
+
 export default function Topicos() {
   const { area } = useParams()
   const navigate = useNavigate()
@@ -96,19 +104,50 @@ export default function Topicos() {
   const cargarConteos = async () => {
     setLoading(true)
 
-    // Traemos solo la columna 'topico' de las preguntas de esta área.
-    const { data, error } = await supabase.from('preguntas').select('topico').eq('area', area)
+    // El conteo lo hace la base (función conteo_preguntas, que respeta RLS: un alumno solo
+    // cuenta preguntas activas, un admin cuenta todas). Si la función fallara, se usa
+    // la consulta directa de antes para que la pantalla no se quede vacía.
+    let filas = null
+    const rpc = await supabase.rpc('conteo_preguntas')
+    if (!rpc.error && rpc.data) {
+      filas = rpc.data
+        .filter(r => r.area === area)
+        .map(r => ({ topico: r.topico, total: Number(r.total) }))
+    } else {
+      console.error('conteo_preguntas falló, se usa la consulta directa:', rpc.error)
+      const directa = await supabase.from('preguntas').select('topico').eq('area', area)
+      if (!directa.error && directa.data) {
+        filas = directa.data.map(r => ({ topico: r.topico, total: 1 }))
+      }
+    }
 
-    if (!error && data) {
+    if (filas) {
       const conteoPorTopico = {}
-      data.forEach(row => {
-        conteoPorTopico[row.topico] = (conteoPorTopico[row.topico] || 0) + 1
+      filas.forEach(r => {
+        if (!r.topico) return
+        conteoPorTopico[r.topico] = (conteoPorTopico[r.topico] || 0) + r.total
       })
 
-      setTopicos(areaMeta.topicos.map(t => {
+      // Tópicos conocidos (con su nombre e imagen): se muestran siempre, "Disponible" desde el umbral.
+      const conocidos = areaMeta.topicos.map(t => {
         const total = conteoPorTopico[t.id] || 0
         return { ...t, preguntas: total, disponible: total >= UMBRAL_DISPONIBLE }
-      }))
+      })
+
+      // Tópicos que existen en la base pero no en topicosMeta: aparecen solos al llegar al umbral.
+      const idsConocidos = new Set(areaMeta.topicos.map(t => t.id))
+      const nuevos = Object.keys(conteoPorTopico)
+        .filter(id => !idsConocidos.has(id) && conteoPorTopico[id] >= UMBRAL_DISPONIBLE)
+        .sort()
+        .map(id => ({
+          id,
+          nombre: nombreDesdeId(id),
+          imagen: `/topicos/${id}.jpg`,
+          preguntas: conteoPorTopico[id],
+          disponible: true,
+        }))
+
+      setTopicos([...conocidos, ...nuevos])
     }
 
     setLoading(false)
