@@ -50,6 +50,7 @@ const topicosMeta = {
     topicos: [
       { id: 'anatomia_cardiovascular', nombre: 'Cardiovascular', imagen: '/topicos/anatomia_cardiovascular.jpg' },
       { id: 'anatomia_respiratoria', nombre: 'Respiratorio', imagen: '/topicos/anatomia_respiratoria.jpg' },
+      { id: 'anatomia_digestiva', nombre: 'Digestivo', imagen: '/topicos/anatomia_digestiva.jpg' },
     ]
   },
   histologia: {
@@ -58,6 +59,7 @@ const topicosMeta = {
     topicos: [
       { id: 'histologia_cardiovascular', nombre: 'Cardiovascular', imagen: '/topicos/histologia_cardiovascular.jpg' },
       { id: 'histologia_respiratoria', nombre: 'Respiratorio', imagen: '/topicos/histologia_respiratoria.jpg' },
+      { id: 'histologia_digestiva', nombre: 'Digestivo', imagen: '/topicos/histologia_digestiva.jpg' },
     ]
   },
   embriologia: {
@@ -67,6 +69,7 @@ const topicosMeta = {
       { id: 'embriologia_cardiovascular', nombre: 'Cardiovascular', imagen: '/topicos/embriologia_cardiovascular.jpg' },
       { id: 'embriologia_renal',          nombre: 'Renal',          imagen: '/topicos/embriologia_renal.jpg' },
       { id: 'embriologia_respiratoria',   nombre: 'Respiratorio',          imagen: '/topicos/embriologia_respiratoria.jpg' },
+      { id: 'embriologia_digestiva',     nombre: 'Digestivo',             imagen: '/topicos/embriologia_digestiva.jpg' },
     ]
   },
   medicina_interna: {

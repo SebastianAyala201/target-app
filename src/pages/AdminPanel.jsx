@@ -53,6 +53,7 @@ const AREA_TOPICO_MAP = {
     topicos: [
       { id: 'anatomia_cardiovascular', nombre: 'Anatomía Cardiovascular' },
       { id: 'anatomia_respiratoria',   nombre: 'Anatomía Respiratoria' },
+      { id: 'anatomia_digestiva',      nombre: 'Anatomía Digestiva' },
     ]
   },
   histologia: {
@@ -60,6 +61,7 @@ const AREA_TOPICO_MAP = {
     topicos: [
       { id: 'histologia_cardiovascular', nombre: 'Histología Cardiovascular' },
       { id: 'histologia_respiratoria',  nombre: 'Histología Respiratoria' },
+      { id: 'histologia_digestiva',     nombre: 'Histología Digestiva' },
     ]
   },
   embriologia: {
@@ -68,6 +70,7 @@ const AREA_TOPICO_MAP = {
       { id: 'embriologia_cardiovascular', nombre: 'Embriología Cardiovascular' },
       { id: 'embriologia_renal',          nombre: 'Embriología Renal' },
       { id: 'embriologia_respiratoria',   nombre: 'Embriología Respiratoria' },
+      { id: 'embriologia_digestiva',      nombre: 'Embriología Digestiva' },
     ]
   },
   medicina_interna: {
