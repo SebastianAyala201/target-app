@@ -60,6 +60,7 @@ const topicosMeta = {
       { id: 'histologia_cardiovascular', nombre: 'Cardiovascular', imagen: '/topicos/histologia_cardiovascular.jpg' },
       { id: 'histologia_respiratoria', nombre: 'Respiratorio', imagen: '/topicos/histologia_respiratoria.jpg' },
       { id: 'histologia_digestiva', nombre: 'Digestivo', imagen: '/topicos/histologia_digestiva.jpg' },
+      { id: 'histologia_renal', nombre: 'Renal', imagen: '/topicos/histologia_renal.jpg' },
     ]
   },
   embriologia: {
